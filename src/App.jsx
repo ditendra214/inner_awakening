@@ -21,10 +21,17 @@ const MainAppContent = () => {
     setForceShowOnboarding(true);
   };
 
+  const handleNavigateToProfile = () => {
+    setActiveTab('me');
+  };
+
   return (
-    <div className="min-h-screen bg-[#060810] text-slate-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
-      {/* Top Cyber Navigation Bar */}
-      <Navbar onOpenHealthModal={handleOpenOnboarding} />
+    <div className="min-h-screen bg-[#05070e] text-slate-100 flex flex-col font-sans selection:bg-[#ffd700] selection:text-black">
+      {/* Top Solo Leveling System Navigation Bar with User Profile & Log Out */}
+      <Navbar 
+        onOpenHealthModal={handleOpenOnboarding} 
+        onNavigateToProfile={handleNavigateToProfile}
+      />
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-5 md:py-8">
@@ -35,10 +42,10 @@ const MainAppContent = () => {
         {activeTab === 'me' && <ProfileView onOpenOnboarding={handleOpenOnboarding} />}
       </main>
 
-      {/* Wireframe-accurate Notification Modal */}
+      {/* Wireframe-accurate Solo Leveling Notification Modal */}
       <NotificationModal />
 
-      {/* Health Care & Onboarding Questionnaire Modal */}
+      {/* Health Care & Step-by-Step Onboarding Questionnaire Modal */}
       {(!profile.completedOnboarding || forceShowOnboarding) && (
         <OnboardingModal />
       )}

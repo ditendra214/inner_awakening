@@ -4,38 +4,39 @@ import { sound } from '../services/soundEngine';
 
 const GameContext = createContext();
 
-const INITIAL_PROFILE = {
-  name: 'CyberRunner_X',
+// Fresh Account Starting Baseline (Level 1, 0 XP, 0 Coins)
+const FRESH_PROFILE = {
+  name: 'Hunter_Sung',
   gender: 'Cyber Synth',
   goal: 'Titan Strength',
-  age: 22,
-  height: 178,
-  weight: 72,
+  age: 21,
+  height: 175,
+  weight: 70,
   healthIssues: ['None / Iron Core'],
-  healthNotes: 'Fully cleared for high-intensity bio-kinetic training.',
+  healthNotes: '',
   department: 'CSE-A',
   completedOnboarding: false
 };
 
-const INITIAL_ATTRIBUTES = {
-  stamina: 68,
-  strength: 74,
-  energy: 85,
-  flexibility: 52,
-  consistency: 90
+const FRESH_ATTRIBUTES = {
+  stamina: 10,
+  strength: 10,
+  energy: 25,
+  flexibility: 10,
+  consistency: 5
 };
 
-const INITIAL_BUILDINGS = [
+const FRESH_BUILDINGS = [
   {
     id: 'cyber_outpost',
-    name: 'Cyber Outpost Pod',
+    name: 'Shadow Outpost Pod',
     type: 'habitation',
     level: 1,
     minPlayerLevel: 1,
     unlocked: true,
-    cost: 0,
-    bonus: '+5% XP on all missions',
-    description: 'Your base of operations in Neo-Arcadia 2050.',
+    cost: 100,
+    bonus: '+5% XP on all quests',
+    description: 'Your starter dimensional outpost in Neo-Arcadia 2050.',
     icon: 'Terminal'
   },
   {
@@ -82,7 +83,7 @@ const INITIAL_BUILDINGS = [
     minPlayerLevel: 12,
     unlocked: false,
     cost: 1000,
-    bonus: 'Enables 2x multiplier in College Battles',
+    bonus: 'Enables 2x multiplier in Guild Battles',
     description: 'Colosseum for interplanetary campus fitness supremacy.',
     icon: 'Trophy'
   },
@@ -94,20 +95,20 @@ const INITIAL_BUILDINGS = [
     minPlayerLevel: 20,
     unlocked: false,
     cost: 2000,
-    bonus: 'Unlocks Supreme Awakened Title & Aura',
+    bonus: 'Unlocks Supreme Monarch Title & Aura',
     description: 'A thriving planetary biome powered entirely by your steps.',
     icon: 'Building2'
   }
 ];
 
-const INITIAL_MISSIONS = [
+const FRESH_MISSIONS = [
   {
     id: 'm1',
     title: 'Explorer Recon',
     type: 'easy',
     category: 'Walk / Steps',
     target: 2000,
-    current: 1420,
+    current: 0, // Starts fresh at 0
     unit: 'steps',
     xpReward: 100,
     coinReward: 35,
@@ -122,7 +123,7 @@ const INITIAL_MISSIONS = [
     type: 'medium',
     category: 'Workout',
     target: 15,
-    current: 0,
+    current: 0, // Starts fresh at 0
     unit: 'minutes',
     xpReward: 250,
     coinReward: 60,
@@ -137,7 +138,7 @@ const INITIAL_MISSIONS = [
     type: 'hard',
     category: 'Cardio / Run',
     target: 30,
-    current: 10,
+    current: 0, // Starts fresh at 0
     unit: 'minutes',
     xpReward: 600,
     coinReward: 150,
@@ -152,7 +153,7 @@ const INITIAL_MISSIONS = [
     type: 'recovery',
     category: 'Recovery',
     target: 5,
-    current: 0,
+    current: 0, // Starts fresh at 0
     unit: 'minutes',
     xpReward: 120,
     coinReward: 25,
@@ -164,10 +165,10 @@ const INITIAL_MISSIONS = [
 ];
 
 const INITIAL_COLLEGE_TEAMS = [
-  { id: 'cse-a', name: 'CSE-A (Cyber Synergists)', xp: 82450, members: 48, rank: 1, color: '#00f0ff' },
-  { id: 'cse-b', name: 'CSE-B (Quantum Dynamos)', xp: 76800, members: 45, rank: 2, color: '#ff007f' },
-  { id: 'it-a', name: 'IT-A (Neural Phantoms)', xp: 71200, members: 42, rank: 3, color: '#ffe600' },
-  { id: 'mech-1', name: 'MECH Titan Force', xp: 63100, members: 39, rank: 4, color: '#39ff14' }
+  { id: 'cse-a', name: 'CSE-A (Shadow Legion)', xp: 82450, members: 48, rank: 1, color: '#ffd700' },
+  { id: 'cse-b', name: 'CSE-B (White Tiger)', xp: 76800, members: 45, rank: 2, color: '#ff9900' },
+  { id: 'it-a', name: 'IT-A (Fiend Guild)', xp: 71200, members: 42, rank: 3, color: '#f59e0b' },
+  { id: 'mech-1', name: 'MECH Titan Guild', xp: 63100, members: 39, rank: 4, color: '#39ff14' }
 ];
 
 const INITIAL_SHOP_ITEMS = [
@@ -176,8 +177,8 @@ const INITIAL_SHOP_ITEMS = [
     name: 'Holo-HUD Visor v4',
     type: 'gear',
     cost: 150,
-    purchased: true,
-    equipped: true,
+    purchased: false,
+    equipped: false,
     bonus: '+5% Mission XP',
     desc: 'Retinal AR overlay with real-time biometric telemetry.'
   },
@@ -214,42 +215,51 @@ const INITIAL_SHOP_ITEMS = [
 ];
 
 export const GameProvider = ({ children }) => {
-  // Load or default state
+  // Load previously exited data from localStorage or start with fresh initial values
   const [profile, setProfile] = useState(() => {
     const saved = localStorage.getItem('ia_profile');
-    return saved ? JSON.parse(saved) : INITIAL_PROFILE;
+    return saved ? JSON.parse(saved) : FRESH_PROFILE;
   });
 
+  // Initial starting values for fresh account: Level 1, 0 XP, 0 FitCoins, 1 Day Streak, 100% Energy
   const [level, setLevel] = useState(() => {
     const saved = localStorage.getItem('ia_level');
-    return saved ? parseInt(saved, 10) : 3;
+    return saved ? parseInt(saved, 10) : 1;
   });
 
   const [xp, setXp] = useState(() => {
     const saved = localStorage.getItem('ia_xp');
-    return saved ? parseInt(saved, 10) : 340;
+    return saved ? parseInt(saved, 10) : 0;
   });
 
   const [fitCoins, setFitCoins] = useState(() => {
     const saved = localStorage.getItem('ia_coins');
-    return saved ? parseInt(saved, 10) : 380;
+    return saved ? parseInt(saved, 10) : 0;
   });
 
-  const [streak, setStreak] = useState(7);
-  const [energy, setEnergy] = useState(88);
+  const [streak, setStreak] = useState(() => {
+    const saved = localStorage.getItem('ia_streak');
+    return saved ? parseInt(saved, 10) : 1;
+  });
+
+  const [energy, setEnergy] = useState(() => {
+    const saved = localStorage.getItem('ia_energy');
+    return saved ? parseInt(saved, 10) : 100;
+  });
+
   const [attributes, setAttributes] = useState(() => {
     const saved = localStorage.getItem('ia_attributes');
-    return saved ? JSON.parse(saved) : INITIAL_ATTRIBUTES;
+    return saved ? JSON.parse(saved) : FRESH_ATTRIBUTES;
   });
 
   const [buildings, setBuildings] = useState(() => {
     const saved = localStorage.getItem('ia_buildings');
-    return saved ? JSON.parse(saved) : INITIAL_BUILDINGS;
+    return saved ? JSON.parse(saved) : FRESH_BUILDINGS;
   });
 
   const [missions, setMissions] = useState(() => {
     const saved = localStorage.getItem('ia_missions');
-    return saved ? JSON.parse(saved) : INITIAL_MISSIONS;
+    return saved ? JSON.parse(saved) : FRESH_MISSIONS;
   });
 
   const [collegeTeams, setCollegeTeams] = useState(() => {
@@ -265,7 +275,7 @@ export const GameProvider = ({ children }) => {
   const [soundMuted, setSoundMuted] = useState(false);
   const [ambientActive, setAmbientActive] = useState(false);
 
-  // Notification Modal state (matches user's wireframe sketch)
+  // Notification alert modal state
   const [showLevelUpAlert, setShowLevelUpAlert] = useState(false);
   const [levelUpMessage, setLevelUpMessage] = useState("Your next level awaits. Are you ready to prove yourself?");
 
@@ -273,7 +283,7 @@ export const GameProvider = ({ children }) => {
   const getXpThreshold = (lvl) => lvl * 200 + (lvl - 1) * 100;
   const currentThreshold = getXpThreshold(level);
 
-  // Save changes to localStorage
+  // Persistent storage: save continuous state whenever updated
   useEffect(() => {
     localStorage.setItem('ia_profile', JSON.stringify(profile));
   }, [profile]);
@@ -289,6 +299,14 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('ia_coins', fitCoins.toString());
   }, [fitCoins]);
+
+  useEffect(() => {
+    localStorage.setItem('ia_streak', streak.toString());
+  }, [streak]);
+
+  useEffect(() => {
+    localStorage.setItem('ia_energy', energy.toString());
+  }, [energy]);
 
   useEffect(() => {
     localStorage.setItem('ia_attributes', JSON.stringify(attributes));
@@ -323,12 +341,59 @@ export const GameProvider = ({ children }) => {
     setAmbientActive(active);
   };
 
+  // Create Fresh Hunter Account with initial starting scores (Level 1, 0 XP, 0 Coins)
+  const initializeNewAccount = (newProfileData) => {
+    const fullProfile = {
+      ...newProfileData,
+      completedOnboarding: true
+    };
+    setProfile(fullProfile);
+    setLevel(1);
+    setXp(0);
+    setFitCoins(0);
+    setStreak(1);
+    setEnergy(100);
+    setAttributes(FRESH_ATTRIBUTES);
+    setBuildings(FRESH_BUILDINGS);
+    setMissions(FRESH_MISSIONS);
+    setInventory(INITIAL_SHOP_ITEMS);
+
+    localStorage.setItem('ia_profile', JSON.stringify(fullProfile));
+    localStorage.setItem('ia_level', '1');
+    localStorage.setItem('ia_xp', '0');
+    localStorage.setItem('ia_coins', '0');
+    localStorage.setItem('ia_streak', '1');
+    localStorage.setItem('ia_energy', '100');
+    localStorage.setItem('ia_attributes', JSON.stringify(FRESH_ATTRIBUTES));
+    localStorage.setItem('ia_buildings', JSON.stringify(FRESH_BUILDINGS));
+    localStorage.setItem('ia_missions', JSON.stringify(FRESH_MISSIONS));
+    localStorage.setItem('ia_inventory', JSON.stringify(INITIAL_SHOP_ITEMS));
+  };
+
+  // Sign In / Restore Previously Exited Session
+  const restorePreviousSession = () => {
+    const saved = localStorage.getItem('ia_profile');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setProfile({ ...parsed, completedOnboarding: true });
+      return true;
+    }
+    return false;
+  };
+
+  // Log Out / Disconnect from System
+  const logoutHunter = () => {
+    sound.playClick();
+    setProfile(prev => ({ ...prev, completedOnboarding: false }));
+    // Data remains preserved in localStorage so signing back in resumes the exact state
+  };
+
   // Add XP and handle level up
   const addXP = (amount) => {
     const newXp = xp + amount;
     const threshold = getXpThreshold(level);
 
-    // Also contribute to user's college team
+    // Contribute to guild score
     setCollegeTeams(prev => prev.map(t => {
       if (t.id === profile.department.toLowerCase().replace(/[^a-z0-9]/g, '-') || t.name.includes(profile.department)) {
         return { ...t, xp: t.xp + amount };
@@ -341,19 +406,17 @@ export const GameProvider = ({ children }) => {
       const nextLevel = level + 1;
       setLevel(nextLevel);
       setXp(leftover);
-      setFitCoins(prev => prev + 100); // Bonus coins on level up
+      setFitCoins(prev => prev + 100);
       sound.playLevelUp();
 
-      // Trigger Confetti
       confetti({
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#00f0ff', '#ff007f', '#39ff14', '#ffe600']
+        colors: ['#ffd700', '#ffbe3b', '#ffffff', '#e69500']
       });
 
-      // Show wireframe level-up notification
-      setLevelUpMessage(`Your level ${nextLevel} ascension is ready. Are you prepared to test your cybernetic limits?`);
+      setLevelUpMessage(`Your level ${nextLevel} ascension is ready. Are you prepared to test your limits?`);
       setShowLevelUpAlert(true);
     } else {
       setXp(newXp);
@@ -370,11 +433,10 @@ export const GameProvider = ({ children }) => {
     const mission = missions.find(m => m.id === missionId);
     if (!mission || mission.completed) return;
 
-    sound.playQuestComplete();
+    sound.playSoloLevelingMessageTone();
     addXP(mission.xpReward);
     addFitCoins(mission.coinReward);
 
-    // Boost corresponding stat
     if (mission.statBonus && attributes[mission.statBonus] !== undefined) {
       setAttributes(prev => ({
         ...prev,
@@ -393,7 +455,6 @@ export const GameProvider = ({ children }) => {
     if (type === 'steps') {
       earnedXp = Math.round(amount * 0.05);
       earnedCoins = Math.round(amount * 0.015);
-      // Progress step missions
       setMissions(prev => prev.map(m => {
         if (m.unit === 'steps' && !m.completed) {
           const nextVal = m.current + amount;
@@ -439,14 +500,13 @@ export const GameProvider = ({ children }) => {
     if (!building) return { success: false, message: 'Structure not found.' };
 
     if (fitCoins < building.cost) {
-      return { success: false, message: 'Insufficient FitCoins. Complete missions to harvest coins.' };
+      return { success: false, message: 'Insufficient FitCoins. Complete quests to harvest coins.' };
     }
 
     if (level < building.minPlayerLevel) {
-      return { success: false, message: `Access restricted: Requires Character Level ${building.minPlayerLevel}.` };
+      return { success: false, message: `Access restricted: Requires Hunter Level ${building.minPlayerLevel}.` };
     }
 
-    // Deduct coins & level up building
     setFitCoins(prev => prev - building.cost);
     sound.playLevelUp();
 
@@ -462,8 +522,8 @@ export const GameProvider = ({ children }) => {
       return b;
     }));
 
-    addXP(150); // XP reward for building growth!
-    return { success: true, message: `${building.name} upgraded successfully! Colony expanded.` };
+    addXP(150);
+    return { success: true, message: `${building.name} upgraded successfully! Domain expanded.` };
   };
 
   // Purchase Equipment in Me tab
@@ -472,7 +532,6 @@ export const GameProvider = ({ children }) => {
     if (!item) return;
 
     if (item.purchased) {
-      // Toggle equip
       sound.playClick();
       setInventory(prev => prev.map(i => i.id === itemId ? { ...i, equipped: !i.equipped } : i));
       return;
@@ -487,42 +546,42 @@ export const GameProvider = ({ children }) => {
 
   // Generate dynamic AI quest tailored to health profile & activity
   const generateAIMission = () => {
-    sound.playChirp();
+    sound.playSoloLevelingMessageTone();
     const hasHeartIssue = profile.healthIssues.some(i => i.toLowerCase().includes('heart') || i.toLowerCase().includes('cardiac') || i.toLowerCase().includes('bp'));
     const hasAsthma = profile.healthIssues.some(i => i.toLowerCase().includes('asthma'));
     const hasJointPain = profile.healthIssues.some(i => i.toLowerCase().includes('joint') || i.toLowerCase().includes('back'));
 
-    let questTitle = "AI Adaptive Protocol";
+    let questTitle = "[DAILY TRIAL: AEROBIC ACCELERATION]";
     let category = "Walk / Steps";
     let target = 2500;
     let unit = "steps";
-    let desc = "AI Game Master computed an optimal aerobic pace for metabolic activation.";
+    let desc = "The System computed an optimal aerobic pace for metabolic activation.";
     let xpRew = 200;
     let coinRew = 50;
 
     if (hasJointPain) {
-      questTitle = "Low-Impact Aquatic/Glide Recon";
+      questTitle = "[LOW-IMPACT TRIAL: RECOVERY GLIDE]";
       category = "Low-Impact Walk";
       target = 1800;
       unit = "steps";
       desc = "Joint-friendly low impact movement designed to cushion articular cartilage.";
       xpRew = 220;
     } else if (hasHeartIssue) {
-      questTitle = "Zone 2 Steady-State Matrix";
+      questTitle = "[ZONE 2 TRIAL: STEADY-STATE MATRIX]";
       category = "Paced Walk";
       target = 12;
       unit = "minutes";
       desc = "Heart-safe moderate pacing strictly maintaining sub-maximal cardiac BPM.";
       xpRew = 240;
     } else if (hasAsthma) {
-      questTitle = "Interval Aerobic Cadence";
+      questTitle = "[PULSED TRIAL: INTERVAL CADENCE]";
       category = "Interval Walk";
       target = 15;
       unit = "minutes";
       desc = "Controlled respiration rhythm with scheduled recovery pauses.";
       xpRew = 210;
     } else {
-      questTitle = "Hyper-Kinetic Cyber Sprint";
+      questTitle = "[HARD TRIAL: MONARCH SPRINTS]";
       category = "HIIT / Cardio";
       target = 20;
       unit = "minutes";
@@ -579,7 +638,10 @@ export const GameProvider = ({ children }) => {
         logActivity,
         upgradeBuilding,
         buyEquipment,
-        generateAIMission
+        generateAIMission,
+        initializeNewAccount,
+        restorePreviousSession,
+        logoutHunter
       }}
     >
       {children}

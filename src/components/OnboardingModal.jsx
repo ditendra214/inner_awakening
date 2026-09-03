@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
 import { 
   Activity, ShieldAlert, Sparkles, User, Heart, Compass, 
-  Dumbbell, Target, CheckCircle2, ChevronRight, Crown
+  Dumbbell, Target, CheckCircle2, ChevronRight, ChevronLeft, Crown, Check
 } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { sound } from '../services/soundEngine';
 
 export const OnboardingModal = () => {
-  const { profile, setProfile } = useGame();
-  const [step, setStep] = useState(profile.completedOnboarding ? 'done' : 'landing');
+  const { profile, initializeNewAccount, restorePreviousSession } = useGame();
+  
+  // 'landing' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 'confirm'
+  const [currentStep, setCurrentStep] = useState(profile.completedOnboarding ? 'done' : 'landing');
+  const [signInFeedback, setSignInFeedback] = useState('');
 
   // Form states
   const [name, setName] = useState(profile.name || 'Sung_Jin_Woo');
   const [gender, setGender] = useState(profile.gender || 'Cyber Synth');
   const [goal, setGoal] = useState(profile.goal || 'Titan Strength');
-  const [age, setAge] = useState(profile.age || 22);
+  const [age, setAge] = useState(profile.age || 21);
   const [height, setHeight] = useState(profile.height || 178);
   const [weight, setWeight] = useState(profile.weight || 72);
   const [selectedIssues, setSelectedIssues] = useState(profile.healthIssues || ['None / Iron Core']);
   const [customHealthNote, setCustomHealthNote] = useState(profile.healthNotes || '');
   const [department, setDepartment] = useState(profile.department || 'CSE-A');
 
-  if (step === 'done') return null;
+  if (currentStep === 'done') return null;
+
+  const TOTAL_STEPS = 8;
 
   const HEALTH_ISSUE_OPTIONS = [
     { id: 'none', label: 'None / Iron Core (Full Exertion Cleared)' },
@@ -38,6 +43,28 @@ export const OnboardingModal = () => {
     { id: 'Neon Endurance', title: 'Endless Stamina (Cardio)', desc: 'High-VO2 respiratory endurance & stamina pool' },
     { id: 'Zen Flow', title: 'Mana Regeneration (Mobility)', desc: 'Full-body flexibility, joint healing & calmness' }
   ];
+
+  const nextStep = () => {
+    sound.playSoloLevelingMessageTone();
+    if (typeof currentStep === 'number') {
+      if (currentStep < TOTAL_STEPS) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        setCurrentStep('confirm');
+      }
+    }
+  };
+
+  const prevStep = () => {
+    sound.playClick();
+    if (currentStep === 'confirm') {
+      setCurrentStep(TOTAL_STEPS);
+    } else if (typeof currentStep === 'number' && currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      setCurrentStep('landing');
+    }
+  };
 
   const handleToggleIssue = (label) => {
     sound.playClick();
@@ -58,20 +85,27 @@ export const OnboardingModal = () => {
 
   const handleStartNow = () => {
     sound.playSoloLevelingMessageTone();
-    setStep('form');
+    setCurrentStep(1); // Ask questions one by one starting from Step 1
   };
 
   const handleSignIn = () => {
     sound.playSoloLevelingMessageTone();
-    setStep('form');
+    const success = restorePreviousSession();
+    if (success) {
+      setCurrentStep('done');
+    } else {
+      setSignInFeedback("No previous saved hunter session detected. Starting new awakening!");
+      setTimeout(() => {
+        setSignInFeedback('');
+        setCurrentStep(1);
+      }, 1500);
+    }
   };
 
-  const handleComplete = (e) => {
-    e.preventDefault();
+  // Final confirmation to initialize brand new account with 0 score (Level 1, 0 XP, 0 Coins)
+  const handleFinalAwakening = () => {
     sound.playLevelUp();
-
-    const updated = {
-      ...profile,
+    initializeNewAccount({
       name,
       gender,
       goal,
@@ -80,23 +114,22 @@ export const OnboardingModal = () => {
       weight: Number(weight),
       healthIssues: selectedIssues,
       healthNotes: customHealthNote,
-      department,
-      completedOnboarding: true
-    };
-
-    setProfile(updated);
-    setStep('done');
+      department
+    });
+    setCurrentStep('done');
   };
+
+  // Live BMI calculation
+  const heightM = height / 100;
+  const bmi = (weight / (heightM * heightM)).toFixed(1);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto">
-      {/* 1. Landing View matching user wireframe sketch with Solo Leveling Gold styling */}
-      {step === 'landing' && (
-        <div className="relative w-full max-w-sm border-4 border-[#ffbe3b] rounded-3xl p-8 bg-[#090602] shadow-neon-gold flex flex-col items-center justify-between min-h-[580px] my-auto">
-          {/* Top Speaker Slot */}
+      {/* 0. Wireframe Landing Screen (Phone Container: INNER AWAKENING, START NOW, SIGN IN) */}
+      {currentStep === 'landing' && (
+        <div className="relative w-full max-w-sm border-4 border-[#ffbe3b] rounded-3xl p-8 bg-[#090602] shadow-neon-gold flex flex-col items-center justify-between min-h-[580px] my-auto system-window">
           <div className="w-20 h-1.5 bg-[#2c1d04] rounded-full mb-6"></div>
 
-          {/* Title Header */}
           <div className="text-center my-auto flex flex-col items-center">
             <div className="w-16 h-16 rounded-2xl bg-[#ffbe3b]/10 border border-[#ffd700] flex items-center justify-center mb-6 shadow-neon-gold">
               <Crown className="text-[#ffd700] w-9 h-9 animate-pulse" />
@@ -110,9 +143,14 @@ export const OnboardingModal = () => {
             <div className="mt-4 px-3 py-1 bg-[#221603] border border-[#ffbe3b]/50 rounded text-[11px] font-mono text-[#ffd700]">
               REAL WORLD → SYSTEM → LEVEL UP
             </div>
+
+            {signInFeedback && (
+              <p className="text-xs font-mono text-amber-300 mt-3 animate-pulse">
+                {signInFeedback}
+              </p>
+            )}
           </div>
 
-          {/* Buttons matching wireframe: [start now] and [sign in] */}
           <div className="w-full space-y-4 mt-8">
             <button
               onClick={handleStartNow}
@@ -126,78 +164,107 @@ export const OnboardingModal = () => {
               onClick={handleSignIn}
               className="w-full py-2.5 bg-transparent hover:bg-amber-950/40 text-amber-300 font-mono text-sm tracking-wider uppercase underline decoration-[#ffd700] transition-colors"
             >
-              SIGN IN
+              SIGN IN (CONTINUE PREVIOUS PROGRESS)
             </button>
           </div>
 
-          {/* Bottom Home Bar */}
           <div className="w-28 h-1 bg-amber-900/60 rounded-full mt-6"></div>
         </div>
       )}
 
-      {/* 2. Health Care & User Intake Form with Solo Leveling Golden HUD */}
-      {step === 'form' && (
-        <div className="relative w-full max-w-2xl bg-[#0a0702] border-2 border-[#ffbe3b] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto max-h-[90vh] overflow-y-auto system-window">
-          {/* Top Banner */}
-          <div className="flex items-center justify-between border-b border-[#ffbe3b]/40 pb-4 mb-6">
+      {/* 1 to 8: Step-by-Step (One by One) Questionnaire */}
+      {typeof currentStep === 'number' && (
+        <div className="relative w-full max-w-lg bg-[#0a0702] border-2 border-[#ffbe3b] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto system-window animate-fade-in">
+          {/* Progress Indicator */}
+          <div className="flex items-center justify-between border-b border-[#ffbe3b]/30 pb-3 mb-6">
             <div>
-              <span className="text-[10px] font-mono text-[#ffd700] uppercase tracking-widest">
-                [ SYSTEM: HUNTER REGISTRATION & HEALTH TELEMETRY ]
+              <span className="text-[10px] font-mono text-[#ffd700] uppercase tracking-widest block">
+                [ SYSTEM REGISTRATION: STEP {currentStep} OF {TOTAL_STEPS} ]
               </span>
-              <h2 className="font-cyber text-2xl font-black tracking-wide text-white uppercase mt-1 gold-glow-text">
-                AWAKEN YOUR STATUS WINDOW
-              </h2>
+              <span className="text-xs font-mono text-amber-400">
+                {Math.round((currentStep / TOTAL_STEPS) * 100)}% Synchronized
+              </span>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-[#ffbe3b]/10 border border-[#ffd700] flex items-center justify-center">
-              <Activity className="text-[#ffd700]" size={22} />
+            <div className="w-28 h-2 bg-[#191104] rounded-full border border-[#ffbe3b]/40 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#e69500] to-[#ffd700] transition-all duration-300"
+                style={{ width: `${(currentStep / TOTAL_STEPS) * 100}%` }}
+              ></div>
             </div>
           </div>
 
-          <form onSubmit={handleComplete} className="space-y-6">
-            {/* Alias & Gender */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
-                  Hunter Call-Sign (Alias)
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-                  placeholder="e.g. Sung_Jin_Woo"
-                />
+          {/* STEP 1: Hunter Name */}
+          {currentStep === 1 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <User size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Hunter Identification
+                </h3>
               </div>
+              <p className="text-xs text-amber-200/80">
+                State your designated Hunter call-sign for System registry:
+              </p>
+              <input
+                type="text"
+                autoFocus
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. Sung_Jin_Woo"
+                className="w-full bg-[#181003] border-2 border-[#ffbe3b]/60 rounded-xl px-4 py-3 text-white font-cyber text-base focus:outline-none focus:border-[#ffd700] shadow-[inset_0_0_10px_rgba(0,0,0,0.8)]"
+              />
+            </div>
+          )}
 
-              <div>
-                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
-                  Hunter Classification / Gender
-                </label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Non-Binary">Non-Binary</option>
-                  <option value="Cyber Synth">Cyber Synth</option>
-                </select>
+          {/* STEP 2: Classification / Gender */}
+          {currentStep === 2 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <ShieldAlert size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Hunter Classification
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Select your biological or synthetic category:
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {['Male', 'Female', 'Non-Binary', 'Cyber Synth'].map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => { sound.playClick(); setGender(g); }}
+                    className={`py-3 px-4 rounded-xl border text-sm font-cyber font-bold transition-all ${
+                      gender === g 
+                        ? 'border-[#ffd700] bg-[#291b05] text-[#ffd700] shadow-neon-gold' 
+                        : 'border-amber-950 bg-[#140e04] text-amber-300/70 hover:border-amber-700'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Choose Your Goal */}
-            <div>
-              <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-2">
-                Choose Your Hunter Path (Evolution Goal)
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* STEP 3: Evolution Goal */}
+          {currentStep === 3 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <Target size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Choose Your Goal
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Select your primary physical training specialization:
+              </p>
+              <div className="space-y-2.5">
                 {GOAL_OPTIONS.map((g) => (
                   <div
                     key={g.id}
                     onClick={() => { sound.playClick(); setGoal(g.id); }}
-                    className={`cursor-pointer p-3 rounded-lg border transition-all ${
+                    className={`cursor-pointer p-3 rounded-xl border transition-all ${
                       goal === g.id
                         ? 'border-[#ffd700] bg-[#271b05] shadow-neon-gold'
                         : 'border-amber-950/60 bg-[#120c03] hover:border-amber-800'
@@ -207,136 +274,252 @@ export const OnboardingModal = () => {
                       <h4 className="font-cyber text-sm font-bold text-white">{g.title}</h4>
                       {goal === g.id && <CheckCircle2 size={16} className="text-[#ffd700]" />}
                     </div>
-                    <p className="text-xs text-amber-200/70 mt-1">{g.desc}</p>
+                    <p className="text-xs text-amber-200/70 mt-0.5">{g.desc}</p>
                   </div>
                 ))}
               </div>
             </div>
+          )}
 
-            {/* Biometrics: Age, Height, Weight */}
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
-                  Age (Years)
-                </label>
-                <input
-                  type="number"
-                  min="12"
-                  max="100"
-                  required
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
-                  Height (cm)
-                </label>
-                <input
-                  type="number"
-                  min="100"
-                  max="250"
-                  required
-                  value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
-                  Weight (kg)
-                </label>
-                <input
-                  type="number"
-                  min="30"
-                  max="200"
-                  required
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-                />
-              </div>
-            </div>
-
-            {/* Health issues for user health care */}
-            <div className="border border-amber-500/50 bg-[#1c1203] p-4 rounded-xl">
-              <div className="flex items-center space-x-2 text-[#ffd700] mb-2">
-                <ShieldAlert size={18} />
-                <h3 className="font-cyber text-sm font-bold uppercase tracking-wider">
-                  Health Care & Safe Conditioning Matrix
+          {/* STEP 4: Age */}
+          {currentStep === 4 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <Activity size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Biological Age
                 </h3>
               </div>
-              <p className="text-xs text-amber-200/80 mb-3">
-                Inner Awakening safeguards your physical body. The System calibrates daily quests to prevent joint strain or cardiovascular damage.
+              <p className="text-xs text-amber-200/80">
+                Used to calibrate safe cardiovascular BPM thresholds (Karvonen formula):
               </p>
+              <input
+                type="number"
+                min="12"
+                max="100"
+                autoFocus
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="w-full bg-[#181003] border-2 border-[#ffbe3b]/60 rounded-xl px-4 py-3 text-white font-mono text-xl focus:outline-none focus:border-[#ffd700]"
+              />
+              <span className="text-[11px] font-mono text-amber-400 block">
+                Calculated Max Heart Rate Safe Limit: {220 - age} BPM
+              </span>
+            </div>
+          )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+          {/* STEP 5: Height */}
+          {currentStep === 5 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <Compass size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Physical Height
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Input your vertical height in centimeters (cm):
+              </p>
+              <input
+                type="number"
+                min="100"
+                max="250"
+                autoFocus
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="w-full bg-[#181003] border-2 border-[#ffbe3b]/60 rounded-xl px-4 py-3 text-white font-mono text-xl focus:outline-none focus:border-[#ffd700]"
+              />
+            </div>
+          )}
+
+          {/* STEP 6: Weight */}
+          {currentStep === 6 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <Dumbbell size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Physical Body Weight
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Input your current mass in kilograms (kg):
+              </p>
+              <input
+                type="number"
+                min="30"
+                max="200"
+                autoFocus
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="w-full bg-[#181003] border-2 border-[#ffbe3b]/60 rounded-xl px-4 py-3 text-white font-mono text-xl focus:outline-none focus:border-[#ffd700]"
+              />
+              <div className="bg-[#181003] p-3 rounded-lg border border-[#ffbe3b]/30 flex items-center justify-between text-xs font-mono">
+                <span className="text-amber-300">Live Body Mass Index (BMI):</span>
+                <span className="text-[#ffd700] font-bold text-sm">{bmi}</span>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 7: Health Issues for User Health Care */}
+          {currentStep === 7 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <ShieldAlert size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Health Care Safeguards
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Inner Awakening safeguards your physical body. Mark any medical conditions so quests are adapted for safe conditioning:
+              </p>
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {HEALTH_ISSUE_OPTIONS.map((opt) => {
                   const active = selectedIssues.includes(opt.label);
                   return (
                     <div
                       key={opt.id}
                       onClick={() => handleToggleIssue(opt.label)}
-                      className={`cursor-pointer px-3 py-2 rounded text-xs border flex items-center space-x-2 transition-colors ${
+                      className={`cursor-pointer px-3 py-2 rounded-lg text-xs border flex items-center space-x-2 transition-colors ${
                         active
-                          ? 'border-[#ffd700] bg-[#342408] text-white font-semibold shadow-[0_0_8px_rgba(255,215,0,0.3)]'
+                          ? 'border-[#ffd700] bg-[#342408] text-white font-semibold'
                           : 'border-amber-950 bg-[#100b02] text-amber-300/60 hover:border-amber-800'
                       }`}
                     >
-                      <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center ${active ? 'border-[#ffd700] bg-[#ffd700]' : 'border-amber-700'}`}>
-                        {active && <div className="w-1.5 h-1.5 bg-black rounded-sm"></div>}
+                      <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${active ? 'border-[#ffd700] bg-[#ffd700]' : 'border-amber-700'}`}>
+                        {active && <Check size={12} className="text-black stroke-[3]" />}
                       </div>
                       <span className="truncate">{opt.label}</span>
                     </div>
                   );
                 })}
               </div>
+              <input
+                type="text"
+                value={customHealthNote}
+                onChange={(e) => setCustomHealthNote(e.target.value)}
+                placeholder="Optional notes: e.g. healing knee strain..."
+                className="w-full bg-[#181003] border border-amber-900 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ffd700]"
+              />
+            </div>
+          )}
 
-              <div>
-                <label className="block text-[11px] font-mono text-amber-300/70 uppercase tracking-wider mb-1">
-                  Additional Medical / Health Care Notes (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={customHealthNote}
-                  onChange={(e) => setCustomHealthNote(e.target.value)}
-                  placeholder="e.g., healing from sprained ankle, low sodium requirement, etc."
-                  className="w-full bg-[#140e04] border border-amber-900 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#ffd700]"
-                />
+          {/* STEP 8: Guild Selection */}
+          {currentStep === 8 && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 text-[#ffd700]">
+                <Crown size={20} />
+                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
+                  Hunter Guild (Campus Squad)
+                </h3>
+              </div>
+              <p className="text-xs text-amber-200/80">
+                Choose the guild you wish to represent in College Fitness Battles:
+              </p>
+              <div className="space-y-2">
+                {[
+                  { id: 'CSE-A', name: 'CSE-A (Shadow Legion Guild)' },
+                  { id: 'CSE-B', name: 'CSE-B (White Tiger Guild)' },
+                  { id: 'IT-A', name: 'IT-A (Fiend Guild)' },
+                  { id: 'MECH-1', name: 'MECH Titan Guild' }
+                ].map((g) => (
+                  <div
+                    key={g.id}
+                    onClick={() => { sound.playClick(); setDepartment(g.id); }}
+                    className={`cursor-pointer p-3 rounded-xl border text-sm font-cyber font-bold transition-all ${
+                      department === g.id
+                        ? 'border-[#ffd700] bg-[#291b05] text-[#ffd700] shadow-neon-gold'
+                        : 'border-amber-950 bg-[#120c03] text-amber-200/70 hover:border-amber-800'
+                    }`}
+                  >
+                    {g.name}
+                  </div>
+                ))}
               </div>
             </div>
+          )}
 
-            {/* Department / College Team Selection */}
-            <div>
-              <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
-                Affiliated Hunter Guild (Campus Squad)
-              </label>
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
-              >
-                <option value="CSE-A">CSE-A (Shadow Legion Guild)</option>
-                <option value="CSE-B">CSE-B (White Tiger Guild)</option>
-                <option value="IT-A">IT-A (Fiend Guild)</option>
-                <option value="MECH-1">MECH Titan Guild</option>
-              </select>
-            </div>
+          {/* Navigation Buttons: Back and Next */}
+          <div className="flex items-center justify-between pt-6 border-t border-[#ffbe3b]/30 mt-6">
+            <button
+              type="button"
+              onClick={prevStep}
+              className="px-4 py-2 bg-[#181003] hover:bg-[#281a04] text-amber-300 font-mono text-xs uppercase rounded-lg border border-[#ffbe3b]/40 flex items-center space-x-1"
+            >
+              <ChevronLeft size={16} />
+              <span>BACK</span>
+            </button>
 
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-4 bg-gradient-to-r from-[#e69500] via-[#ffd700] to-[#fff1a8] hover:from-[#ffd700] hover:to-[#fff9cc] text-black font-cyber font-black tracking-widest text-base uppercase rounded-xl shadow-neon-gold transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2"
-              >
-                <Sparkles size={20} className="fill-black" />
-                <span>ACCEPT AWAKENING & ENTER SYSTEM</span>
-              </button>
+            <button
+              type="button"
+              onClick={nextStep}
+              className="px-6 py-2.5 bg-gradient-to-r from-[#e69500] to-[#ffd700] hover:from-[#ffd700] hover:to-[#ffea75] text-black font-cyber font-black text-xs uppercase tracking-widest rounded-lg shadow-neon-gold flex items-center space-x-1"
+            >
+              <span>{currentStep === TOTAL_STEPS ? 'CONFIRM PROFILE' : 'NEXT'}</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 9. Final Confirmation Screen (Starting Score = 0, Level 1, Day 1 Streak) */}
+      {currentStep === 'confirm' && (
+        <div className="relative w-full max-w-md bg-[#0a0702] border-2 border-[#ffd700] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto system-window animate-fade-in">
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 mx-auto rounded-full bg-[#ffbe3b]/20 border-2 border-[#ffd700] flex items-center justify-center mb-3 shadow-neon-gold">
+              <Sparkles className="text-[#ffd700] animate-spin" size={26} />
             </div>
-          </form>
+            <h3 className="font-cyber text-xl font-black text-white uppercase gold-glow-text">
+              INITIAL STATUS WINDOW READY
+            </h3>
+            <p className="text-xs font-mono text-amber-300 mt-1">
+              [ ACCOUNT BASELINE CALIBRATED ]
+            </p>
+          </div>
+
+          {/* Initial Fresh Values Review */}
+          <div className="bg-[#160f03] p-4 rounded-xl border border-[#ffbe3b]/40 space-y-2 mb-6 text-xs font-mono">
+            <div className="flex justify-between border-b border-amber-950 pb-1.5">
+              <span className="text-amber-400">Hunter Call-Sign:</span>
+              <span className="text-white font-bold">{name}</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-950 pb-1.5">
+              <span className="text-amber-400">Starting Rank:</span>
+              <span className="text-[#ffd700] font-bold">LEVEL 1 (E-Rank)</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-950 pb-1.5">
+              <span className="text-amber-400">Starting XP:</span>
+              <span className="text-[#ffd700] font-bold">0 XP</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-950 pb-1.5">
+              <span className="text-amber-400">Starting Gold / FitCoins:</span>
+              <span className="text-[#ffd700] font-bold">0 FitCoins</span>
+            </div>
+            <div className="flex justify-between border-b border-amber-950 pb-1.5">
+              <span className="text-amber-400">Starting Streak:</span>
+              <span className="text-white font-bold">Day 1</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-amber-400">Starting Energy:</span>
+              <span className="text-[#39ff14] font-bold">100%</span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <button
+              onClick={handleFinalAwakening}
+              className="w-full py-4 bg-gradient-to-r from-[#e69500] via-[#ffd700] to-[#fff1a8] hover:from-[#ffd700] hover:to-[#fff9cc] text-black font-cyber font-black tracking-widest text-sm uppercase rounded-xl shadow-neon-gold transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
+            >
+              <Crown size={18} className="fill-black" />
+              <span>INITIATE INNER AWAKENING</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentStep(TOTAL_STEPS)}
+              className="w-full py-2 bg-transparent text-amber-400 font-mono text-xs uppercase tracking-wider hover:text-white"
+            >
+              Edit Details
+            </button>
+          </div>
         </div>
       )}
     </div>

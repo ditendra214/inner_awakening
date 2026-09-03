@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Volume2, VolumeX, Radio, Bell, Coins, Shield, 
-  Sparkles, Music, Crown
+  Sparkles, Music, Crown, User, LogOut, HeartHandshake, ChevronDown
 } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { sound } from '../services/soundEngine';
 
-export const Navbar = ({ onOpenHealthModal }) => {
+export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
   const { 
+    profile,
     level, 
+    xp,
     fitCoins, 
     soundMuted, 
     toggleSound, 
     ambientActive, 
     toggleAmbient,
     setShowLevelUpAlert,
-    setLevelUpMessage
+    setLevelUpMessage,
+    logoutHunter
   } = useGame();
+
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleNotificationClick = () => {
     sound.playSoloLevelingMessageTone();
@@ -28,10 +33,15 @@ export const Navbar = ({ onOpenHealthModal }) => {
     sound.playSoloLevelingMessageTone();
   };
 
+  const handleLogout = () => {
+    setShowProfileMenu(false);
+    logoutHunter();
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#070502]/90 backdrop-blur-md border-b border-[#ffbe3b]/30 px-4 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+    <header className="sticky top-0 z-40 w-full bg-[#070502]/95 backdrop-blur-md border-b border-[#ffbe3b]/30 px-4 py-2.5 shadow-[0_4px_25px_rgba(0,0,0,0.9)]">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
-        {/* Brand Name - App Name INNER AWAKENING strictly preserved with Solo Leveling Gold styling */}
+        {/* Brand Name - App Name INNER AWAKENING with Solo Leveling Gold styling */}
         <div className="flex items-center space-x-3">
           <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-[#ffbe3b]/10 border border-[#ffbe3b] shadow-neon-gold">
             <Crown className="text-[#ffd700]" size={18} />
@@ -47,7 +57,7 @@ export const Navbar = ({ onOpenHealthModal }) => {
           </div>
         </div>
 
-        {/* Center / Right Stats & Audio Controls */}
+        {/* Center / Right Controls */}
         <div className="flex items-center space-x-2 md:space-x-3">
           {/* Dedicated Solo Leveling Message Tone Button */}
           <button
@@ -74,19 +84,6 @@ export const Navbar = ({ onOpenHealthModal }) => {
             <span className="font-cyber text-xs md:text-sm font-bold">LVL {level}</span>
           </div>
 
-          {/* Shadow Aura Ambient Toggle */}
-          <button
-            onClick={toggleAmbient}
-            title={ambientActive ? "Mute Shadow Mist Drone" : "Activate Shadow Mist Atmosphere"}
-            className={`p-1.5 rounded border transition-all ${
-              ambientActive 
-                ? 'bg-[#291c06] border-[#ffd700] text-[#ffd700] shadow-neon-gold' 
-                : 'bg-[#120d04] border-amber-950 text-amber-500/70 hover:text-amber-200'
-            }`}
-          >
-            <Radio size={16} className={ambientActive ? 'animate-pulse' : ''} />
-          </button>
-
           {/* Sound FX Mute Toggle */}
           <button
             onClick={toggleSound}
@@ -100,7 +97,7 @@ export const Navbar = ({ onOpenHealthModal }) => {
             {soundMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
 
-          {/* System Notification Alert Button matching wireframe trigger */}
+          {/* Wireframe Notification Alert Button */}
           <button
             onClick={handleNotificationClick}
             title="System Alert Notification"
@@ -109,6 +106,74 @@ export const Navbar = ({ onOpenHealthModal }) => {
             <Bell size={16} />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#ffd700] rounded-full animate-ping"></span>
           </button>
+
+          {/* User Profile Icon with Dropdown & Log Out Option */}
+          <div className="relative">
+            <button
+              onClick={() => { sound.playClick(); setShowProfileMenu(!showProfileMenu); }}
+              className="flex items-center space-x-1.5 p-1 px-2 rounded-xl bg-[#1c1305] border border-[#ffd700] hover:bg-[#2b1e08] transition-all shadow-neon-gold"
+              title="Hunter Profile & Options"
+            >
+              <div className="w-6 h-6 rounded-full bg-[#ffbe3b]/20 flex items-center justify-center text-xs">
+                👑
+              </div>
+              <span className="font-cyber text-xs text-[#ffd700] font-bold max-w-[80px] truncate hidden md:inline">
+                {profile.name}
+              </span>
+              <ChevronDown size={14} className="text-[#ffd700]" />
+            </button>
+
+            {/* Profile Dropdown Menu */}
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-64 bg-[#0a0702] border-2 border-[#ffbe3b] rounded-xl shadow-neon-gold p-4 z-50 system-window animate-fade-in">
+                <div className="border-b border-[#ffbe3b]/30 pb-3 mb-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl">👑</span>
+                    <div>
+                      <h4 className="font-cyber text-sm font-bold text-white uppercase gold-glow-text">
+                        {profile.name}
+                      </h4>
+                      <p className="text-[10px] font-mono text-amber-300">
+                        {profile.goal} • {profile.department}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs font-mono flex justify-between text-amber-200/80 bg-[#160f04] p-1.5 rounded">
+                    <span>Rank: Level {level}</span>
+                    <span className="text-[#ffd700] font-bold">{xp} XP</span>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 text-xs font-mono">
+                  <button
+                    onClick={() => { setShowProfileMenu(false); onNavigateToProfile && onNavigateToProfile('stats'); }}
+                    className="w-full text-left py-2 px-3 rounded hover:bg-[#241704] text-amber-200 flex items-center space-x-2 transition-colors"
+                  >
+                    <User size={14} className="text-[#ffd700]" />
+                    <span>View Status Window</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setShowProfileMenu(false); onOpenHealthModal && onOpenHealthModal(); }}
+                    className="w-full text-left py-2 px-3 rounded hover:bg-[#241704] text-amber-200 flex items-center space-x-2 transition-colors"
+                  >
+                    <HeartHandshake size={14} className="text-[#ffd700]" />
+                    <span>Edit Health Profile</span>
+                  </button>
+
+                  <div className="border-t border-[#ffbe3b]/20 pt-2 mt-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full py-2 px-3 rounded bg-[#2e0904] hover:bg-[#480e07] text-[#fca5a5] border border-rose-600/50 font-cyber font-bold text-xs uppercase tracking-wider flex items-center justify-center space-x-2 transition-colors shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+                    >
+                      <LogOut size={14} />
+                      <span>LOG OUT / DISCONNECT</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
