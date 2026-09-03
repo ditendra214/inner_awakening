@@ -8,7 +8,7 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
     { id: 'play', label: 'Quests', icon: Gamepad2, highlight: 'text-[#ffbe3b]', border: 'border-[#ffbe3b]' },
     { id: 'world', label: 'Gates', icon: Globe, highlight: 'text-[#f59e0b]', border: 'border-[#f59e0b]' },
     { id: 'community', label: 'Guilds', icon: Users, highlight: 'text-[#ffd700]', border: 'border-[#ffd700]' },
-    { id: 'me', label: 'Hunter', icon: User, highlight: 'text-[#fff1a8]', border: 'border-[#fff1a8]' }
+    { id: 'me', label: 'Player', icon: User, highlight: 'text-[#fff1a8]', border: 'border-[#fff1a8]' }
   ];
 
   const handleTabSelect = (tabId) => {

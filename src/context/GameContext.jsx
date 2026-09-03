@@ -6,7 +6,7 @@ const GameContext = createContext();
 
 // Fresh Account Starting Baseline (Level 1, 0 XP, 0 Coins)
 const FRESH_PROFILE = {
-  name: 'Hunter_Sung',
+  name: 'Player_One',
   gender: 'Cyber Synth',
   goal: 'Titan Strength',
   age: 21,
@@ -382,7 +382,7 @@ export const GameProvider = ({ children }) => {
   };
 
   // Log Out / Disconnect from System
-  const logoutHunter = () => {
+  const logoutPlayer = () => {
     sound.playClick();
     setProfile(prev => ({ ...prev, completedOnboarding: false }));
     // Data remains preserved in localStorage so signing back in resumes the exact state
@@ -504,7 +504,7 @@ export const GameProvider = ({ children }) => {
     }
 
     if (level < building.minPlayerLevel) {
-      return { success: false, message: `Access restricted: Requires Hunter Level ${building.minPlayerLevel}.` };
+      return { success: false, message: `Access restricted: Requires Player Level ${building.minPlayerLevel}.` };
     }
 
     setFitCoins(prev => prev - building.cost);
@@ -641,7 +641,8 @@ export const GameProvider = ({ children }) => {
         generateAIMission,
         initializeNewAccount,
         restorePreviousSession,
-        logoutHunter
+        logoutPlayer,
+        logoutHunter: logoutPlayer
       }}
     >
       {children}

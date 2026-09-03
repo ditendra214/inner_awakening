@@ -9,12 +9,12 @@ import { sound } from '../services/soundEngine';
 export const OnboardingModal = () => {
   const { profile, initializeNewAccount, restorePreviousSession } = useGame();
   
-  // 'landing' | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 'confirm'
+  // 'landing' | 1 | 2 | 3 | 4 | 5 | 6 | 7
   const [currentStep, setCurrentStep] = useState(profile.completedOnboarding ? 'done' : 'landing');
   const [signInFeedback, setSignInFeedback] = useState('');
 
-  // Form states
-  const [name, setName] = useState(profile.name || 'Sung_Jin_Woo');
+  // Form states: strictly player data without campus squad
+  const [name, setName] = useState(profile.name || 'Player_One');
   const [gender, setGender] = useState(profile.gender || 'Cyber Synth');
   const [goal, setGoal] = useState(profile.goal || 'Titan Strength');
   const [age, setAge] = useState(profile.age || 21);
@@ -22,11 +22,10 @@ export const OnboardingModal = () => {
   const [weight, setWeight] = useState(profile.weight || 72);
   const [selectedIssues, setSelectedIssues] = useState(profile.healthIssues || ['None / Iron Core']);
   const [customHealthNote, setCustomHealthNote] = useState(profile.healthNotes || '');
-  const [department, setDepartment] = useState(profile.department || 'CSE-A');
 
   if (currentStep === 'done') return null;
 
-  const TOTAL_STEPS = 8;
+  const TOTAL_STEPS = 7;
 
   const HEALTH_ISSUE_OPTIONS = [
     { id: 'none', label: 'None / Iron Core (Full Exertion Cleared)' },
@@ -50,16 +49,15 @@ export const OnboardingModal = () => {
       if (currentStep < TOTAL_STEPS) {
         setCurrentStep(currentStep + 1);
       } else {
-        setCurrentStep('confirm');
+        // At the last step, directly complete registration without showing initial values screen
+        handleFinalAwakening();
       }
     }
   };
 
   const prevStep = () => {
     sound.playClick();
-    if (currentStep === 'confirm') {
-      setCurrentStep(TOTAL_STEPS);
-    } else if (typeof currentStep === 'number' && currentStep > 1) {
+    if (typeof currentStep === 'number' && currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
       setCurrentStep('landing');
@@ -94,7 +92,7 @@ export const OnboardingModal = () => {
     if (success) {
       setCurrentStep('done');
     } else {
-      setSignInFeedback("No previous saved hunter session detected. Starting new awakening!");
+      setSignInFeedback("No previous saved player session detected. Starting new awakening!");
       setTimeout(() => {
         setSignInFeedback('');
         setCurrentStep(1);
@@ -102,7 +100,7 @@ export const OnboardingModal = () => {
     }
   };
 
-  // Final confirmation to initialize brand new account with 0 score (Level 1, 0 XP, 0 Coins)
+  // Direct awakening without showing initial score preview
   const handleFinalAwakening = () => {
     sound.playLevelUp();
     initializeNewAccount({
@@ -114,12 +112,11 @@ export const OnboardingModal = () => {
       weight: Number(weight),
       healthIssues: selectedIssues,
       healthNotes: customHealthNote,
-      department
+      department: 'CSE-A' // default guild in background
     });
     setCurrentStep('done');
   };
 
-  // Live BMI calculation
   const heightM = height / 100;
   const bmi = (weight / (heightM * heightM)).toFixed(1);
 
@@ -138,7 +135,7 @@ export const OnboardingModal = () => {
               INNER<br />AWAKENING
             </h1>
             <p className="font-mono text-xs tracking-widest text-[#ffd700]/80 mt-3 uppercase">
-              [ SYSTEM: SHADOW HUNTER PROTOCOL ]
+              [ SYSTEM: PLAYER AWAKENING ]
             </p>
             <div className="mt-4 px-3 py-1 bg-[#221603] border border-[#ffbe3b]/50 rounded text-[11px] font-mono text-[#ffd700]">
               REAL WORLD → SYSTEM → LEVEL UP
@@ -172,7 +169,7 @@ export const OnboardingModal = () => {
         </div>
       )}
 
-      {/* 1 to 8: Step-by-Step (One by One) Questionnaire */}
+      {/* 1 to 7: Step-by-Step (One by One) Requirements */}
       {typeof currentStep === 'number' && (
         <div className="relative w-full max-w-lg bg-[#0a0702] border-2 border-[#ffbe3b] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto system-window animate-fade-in">
           {/* Progress Indicator */}
@@ -193,24 +190,24 @@ export const OnboardingModal = () => {
             </div>
           </div>
 
-          {/* STEP 1: Hunter Name */}
+          {/* STEP 1: Player Name */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[#ffd700]">
                 <User size={20} />
                 <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
-                  Hunter Identification
+                  Player Identification
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                State your designated Hunter call-sign for System registry:
+                State your designated Player call-sign for System registry:
               </p>
               <input
                 type="text"
                 autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Sung_Jin_Woo"
+                placeholder="e.g. Player_One"
                 className="w-full bg-[#181003] border-2 border-[#ffbe3b]/60 rounded-xl px-4 py-3 text-white font-cyber text-base focus:outline-none focus:border-[#ffd700] shadow-[inset_0_0_10px_rgba(0,0,0,0.8)]"
               />
             </div>
@@ -222,11 +219,11 @@ export const OnboardingModal = () => {
               <div className="flex items-center space-x-2 text-[#ffd700]">
                 <ShieldAlert size={20} />
                 <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
-                  Hunter Classification
+                  Player Classification
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Select your biological or synthetic category:
+                Select your gender classification:
               </p>
               <div className="grid grid-cols-2 gap-3">
                 {['Male', 'Female', 'Non-Binary', 'Cyber Synth'].map((g) => (
@@ -247,7 +244,7 @@ export const OnboardingModal = () => {
             </div>
           )}
 
-          {/* STEP 3: Evolution Goal */}
+          {/* STEP 3: Choose Your Goal */}
           {currentStep === 3 && (
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[#ffd700]">
@@ -257,7 +254,7 @@ export const OnboardingModal = () => {
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Select your primary physical training specialization:
+                Select your primary fitness evolution goal:
               </p>
               <div className="space-y-2.5">
                 {GOAL_OPTIONS.map((g) => (
@@ -291,7 +288,7 @@ export const OnboardingModal = () => {
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Used to calibrate safe cardiovascular BPM thresholds (Karvonen formula):
+                Used to calculate safe cardiovascular training limits (Karvonen formula):
               </p>
               <input
                 type="number"
@@ -314,11 +311,11 @@ export const OnboardingModal = () => {
               <div className="flex items-center space-x-2 text-[#ffd700]">
                 <Compass size={20} />
                 <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
-                  Physical Height
+                  Height (cm)
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Input your vertical height in centimeters (cm):
+                Input your height in centimeters:
               </p>
               <input
                 type="number"
@@ -338,11 +335,11 @@ export const OnboardingModal = () => {
               <div className="flex items-center space-x-2 text-[#ffd700]">
                 <Dumbbell size={20} />
                 <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
-                  Physical Body Weight
+                  Weight (kg)
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Input your current mass in kilograms (kg):
+                Input your body mass in kilograms:
               </p>
               <input
                 type="number"
@@ -360,7 +357,7 @@ export const OnboardingModal = () => {
             </div>
           )}
 
-          {/* STEP 7: Health Issues for User Health Care */}
+          {/* STEP 7: Health Issues for User Health Care (FINAL REQUIREMENT) */}
           {currentStep === 7 && (
             <div className="space-y-4">
               <div className="flex items-center space-x-2 text-[#ffd700]">
@@ -370,7 +367,7 @@ export const OnboardingModal = () => {
                 </h3>
               </div>
               <p className="text-xs text-amber-200/80">
-                Inner Awakening safeguards your physical body. Mark any medical conditions so quests are adapted for safe conditioning:
+                Inner Awakening safeguards your health. Mark any conditions so daily quests adapt for safe training:
               </p>
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {HEALTH_ISSUE_OPTIONS.map((opt) => {
@@ -397,48 +394,13 @@ export const OnboardingModal = () => {
                 type="text"
                 value={customHealthNote}
                 onChange={(e) => setCustomHealthNote(e.target.value)}
-                placeholder="Optional notes: e.g. healing knee strain..."
+                placeholder="Optional medical notes: e.g. recovering from knee sprain..."
                 className="w-full bg-[#181003] border border-amber-900 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#ffd700]"
               />
             </div>
           )}
 
-          {/* STEP 8: Guild Selection */}
-          {currentStep === 8 && (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2 text-[#ffd700]">
-                <Crown size={20} />
-                <h3 className="font-cyber text-lg font-bold uppercase gold-glow-text">
-                  Hunter Guild (Campus Squad)
-                </h3>
-              </div>
-              <p className="text-xs text-amber-200/80">
-                Choose the guild you wish to represent in College Fitness Battles:
-              </p>
-              <div className="space-y-2">
-                {[
-                  { id: 'CSE-A', name: 'CSE-A (Shadow Legion Guild)' },
-                  { id: 'CSE-B', name: 'CSE-B (White Tiger Guild)' },
-                  { id: 'IT-A', name: 'IT-A (Fiend Guild)' },
-                  { id: 'MECH-1', name: 'MECH Titan Guild' }
-                ].map((g) => (
-                  <div
-                    key={g.id}
-                    onClick={() => { sound.playClick(); setDepartment(g.id); }}
-                    className={`cursor-pointer p-3 rounded-xl border text-sm font-cyber font-bold transition-all ${
-                      department === g.id
-                        ? 'border-[#ffd700] bg-[#291b05] text-[#ffd700] shadow-neon-gold'
-                        : 'border-amber-950 bg-[#120c03] text-amber-200/70 hover:border-amber-800'
-                    }`}
-                  >
-                    {g.name}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Navigation Buttons: Back and Next */}
+          {/* Navigation Buttons */}
           <div className="flex items-center justify-between pt-6 border-t border-[#ffbe3b]/30 mt-6">
             <button
               type="button"
@@ -454,70 +416,8 @@ export const OnboardingModal = () => {
               onClick={nextStep}
               className="px-6 py-2.5 bg-gradient-to-r from-[#e69500] to-[#ffd700] hover:from-[#ffd700] hover:to-[#ffea75] text-black font-cyber font-black text-xs uppercase tracking-widest rounded-lg shadow-neon-gold flex items-center space-x-1"
             >
-              <span>{currentStep === TOTAL_STEPS ? 'CONFIRM PROFILE' : 'NEXT'}</span>
+              <span>{currentStep === TOTAL_STEPS ? 'INITIATE INNER AWAKENING' : 'NEXT'}</span>
               <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 9. Final Confirmation Screen (Starting Score = 0, Level 1, Day 1 Streak) */}
-      {currentStep === 'confirm' && (
-        <div className="relative w-full max-w-md bg-[#0a0702] border-2 border-[#ffd700] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto system-window animate-fade-in">
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 mx-auto rounded-full bg-[#ffbe3b]/20 border-2 border-[#ffd700] flex items-center justify-center mb-3 shadow-neon-gold">
-              <Sparkles className="text-[#ffd700] animate-spin" size={26} />
-            </div>
-            <h3 className="font-cyber text-xl font-black text-white uppercase gold-glow-text">
-              INITIAL STATUS WINDOW READY
-            </h3>
-            <p className="text-xs font-mono text-amber-300 mt-1">
-              [ ACCOUNT BASELINE CALIBRATED ]
-            </p>
-          </div>
-
-          {/* Initial Fresh Values Review */}
-          <div className="bg-[#160f03] p-4 rounded-xl border border-[#ffbe3b]/40 space-y-2 mb-6 text-xs font-mono">
-            <div className="flex justify-between border-b border-amber-950 pb-1.5">
-              <span className="text-amber-400">Hunter Call-Sign:</span>
-              <span className="text-white font-bold">{name}</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-950 pb-1.5">
-              <span className="text-amber-400">Starting Rank:</span>
-              <span className="text-[#ffd700] font-bold">LEVEL 1 (E-Rank)</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-950 pb-1.5">
-              <span className="text-amber-400">Starting XP:</span>
-              <span className="text-[#ffd700] font-bold">0 XP</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-950 pb-1.5">
-              <span className="text-amber-400">Starting Gold / FitCoins:</span>
-              <span className="text-[#ffd700] font-bold">0 FitCoins</span>
-            </div>
-            <div className="flex justify-between border-b border-amber-950 pb-1.5">
-              <span className="text-amber-400">Starting Streak:</span>
-              <span className="text-white font-bold">Day 1</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-amber-400">Starting Energy:</span>
-              <span className="text-[#39ff14] font-bold">100%</span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={handleFinalAwakening}
-              className="w-full py-4 bg-gradient-to-r from-[#e69500] via-[#ffd700] to-[#fff1a8] hover:from-[#ffd700] hover:to-[#fff9cc] text-black font-cyber font-black tracking-widest text-sm uppercase rounded-xl shadow-neon-gold transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
-            >
-              <Crown size={18} className="fill-black" />
-              <span>INITIATE INNER AWAKENING</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentStep(TOTAL_STEPS)}
-              className="w-full py-2 bg-transparent text-amber-400 font-mono text-xs uppercase tracking-wider hover:text-white"
-            >
-              Edit Details
             </button>
           </div>
         </div>

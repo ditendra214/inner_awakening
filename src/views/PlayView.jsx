@@ -88,7 +88,7 @@ export const PlayView = () => {
             QUEST DIRECTORY
           </h2>
           <p className="text-xs text-amber-100/80 mt-1 max-w-xl">
-            "Your body is the vessel of the Monarch." Complete the System's daily training quotas to accumulate XP, unlock dimensional facilities, and ascend your hunter rank.
+            "Your body is the vessel of the Monarch." Complete the System's daily training quotas to accumulate XP, unlock dimensional facilities, and ascend your player rank.
           </p>
         </div>
 

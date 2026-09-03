@@ -56,7 +56,7 @@ export const WorldView = () => {
               MONARCH'S EXPEDITION
             </h2>
             <p className="text-xs text-amber-100/80 mt-1 max-w-xl">
-              "Build Your Fitness World" — Real-world physical steps and exercises radiate kinetic mana that expands your hunter stronghold and unlocks passive multiplier buffs.
+              "Build Your Fitness World" — Real-world physical steps and exercises radiate kinetic mana that expands your player domain and unlocks passive multiplier buffs.
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export const WorldView = () => {
                 </span>
               </div>
               <div>
-                <span className="text-amber-400/80 block">REQUIRED HUNTER LEVEL</span>
+                <span className="text-amber-400/80 block">REQUIRED PLAYER LEVEL</span>
                 <span className={level >= selectedBuilding.minPlayerLevel ? 'text-[#39ff14] font-bold' : 'text-rose-400 font-bold'}>
                   Character Lvl {selectedBuilding.minPlayerLevel} {level >= selectedBuilding.minPlayerLevel ? '✓' : `(You: Lvl ${level})`}
                 </span>

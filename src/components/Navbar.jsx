@@ -18,7 +18,7 @@ export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
     toggleAmbient,
     setShowLevelUpAlert,
     setLevelUpMessage,
-    logoutHunter
+    logoutPlayer
   } = useGame();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -35,7 +35,7 @@ export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
 
   const handleLogout = () => {
     setShowProfileMenu(false);
-    logoutHunter();
+    logoutPlayer();
   };
 
   return (
@@ -52,7 +52,7 @@ export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
               INNER AWAKENING
             </h1>
             <span className="text-[10px] font-mono text-[#ffbe3b]/90 tracking-widest uppercase">
-              [ SYSTEM: SHADOW HUNTER HUD ]
+              [ SYSTEM: SHADOW PLAYER HUD ]
             </span>
           </div>
         </div>
@@ -78,7 +78,7 @@ export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
             <span className="text-[10px] text-amber-300/70 font-mono hidden sm:inline">FC</span>
           </div>
 
-          {/* Level / Hunter Rank Badge */}
+          {/* Level / Player Rank Badge */}
           <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded bg-[#160f03] border border-[#ffbe3b]/50 text-[#ffbe3b]">
             <Shield size={14} className="text-[#ffd700]" />
             <span className="font-cyber text-xs md:text-sm font-bold">LVL {level}</span>
@@ -112,7 +112,7 @@ export const Navbar = ({ onOpenHealthModal, onNavigateToProfile }) => {
             <button
               onClick={() => { sound.playClick(); setShowProfileMenu(!showProfileMenu); }}
               className="flex items-center space-x-1.5 p-1 px-2 rounded-xl bg-[#1c1305] border border-[#ffd700] hover:bg-[#2b1e08] transition-all shadow-neon-gold"
-              title="Hunter Profile & Options"
+              title="Player Profile & Options"
             >
               <div className="w-6 h-6 rounded-full bg-[#ffbe3b]/20 flex items-center justify-center text-xs">
                 👑

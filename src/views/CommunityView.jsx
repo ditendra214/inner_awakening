@@ -10,7 +10,7 @@ export const CommunityView = () => {
   const { collegeTeams, profile, addXP } = useGame();
   const [cheerSent, setCheerSent] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { id: 1, user: 'Kavya_Hunter', text: 'Just completed 4,000 steps! CSE-A leading by 5.6k!', time: '2m ago' },
+    { id: 1, user: 'Kavya_Player', text: 'Just completed 4,000 steps! CSE-A leading by 5.6k!', time: '2m ago' },
     { id: 2, user: 'Rohan_Shadow', text: 'CSE-B is catching up fast, push today’s daily quests team!', time: '8m ago' },
     { id: 3, user: 'Vicky_Monarch', text: 'Logged 20 min training. Let’s claim the 500k event reward!', time: '14m ago' }
   ]);
@@ -43,7 +43,7 @@ export const CommunityView = () => {
 
   return (
     <div className="space-y-6 pb-20 animate-fade-in relative z-10">
-      {/* 1. Hunter Guilds Arena Header */}
+      {/* 1. Guilds Arena Header */}
       <div className="bg-[#0e0903] border border-[#ffbe3b]/50 rounded-2xl p-5 md:p-6 shadow-neon-gold system-window">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
@@ -54,10 +54,10 @@ export const CommunityView = () => {
               <span className="text-xs font-mono text-amber-300">CAMPUS RAID LEAGUE</span>
             </div>
             <h2 className="font-cyber text-2xl md:text-3xl font-black text-white uppercase mt-1 gold-glow-text">
-              HUNTER GUILD BATTLE
+              GUILD BATTLE
             </h2>
             <p className="text-xs text-amber-100/80 mt-1 max-w-xl">
-              Every step, workout, and sprint completed in the physical realm fuels kinetic mana into your Hunter Guild's rank on the national leaderboard.
+              Every step, workout, and sprint completed in the physical realm fuels kinetic mana into your Guild's rank on the national leaderboard.
             </p>
           </div>
 
@@ -137,7 +137,7 @@ export const CommunityView = () => {
         <div className="flex items-center justify-between border-b border-[#ffbe3b]/30 pb-3 mb-4">
           <h3 className="font-cyber text-base font-bold text-white uppercase tracking-wider flex items-center space-x-2">
             <Trophy className="text-[#ffd700]" size={18} />
-            <span>LIVE HUNTER GUILD STANDINGS</span>
+            <span>LIVE GUILD STANDINGS</span>
           </h3>
           <span className="text-xs font-mono text-[#ffd700] uppercase">
             YOUR GUILD: {userTeam.name.split(' ')[0]}
@@ -176,7 +176,7 @@ export const CommunityView = () => {
                   </div>
                   <div className="text-right">
                     <span className="font-mono text-sm font-black text-[#ffd700]">{team.xp.toLocaleString()} XP</span>
-                    <span className="text-[10px] font-mono text-amber-400/70 block">{team.members} Hunters</span>
+                    <span className="text-[10px] font-mono text-amber-400/70 block">{team.members} Players</span>
                   </div>
                 </div>
 

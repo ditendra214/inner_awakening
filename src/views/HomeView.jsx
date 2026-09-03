@@ -32,7 +32,7 @@ export const HomeView = ({ setActiveTab }) => {
   const handleSimulateSteps = () => {
     sound.playSoloLevelingMessageTone();
     logActivity('steps', Number(simSteps));
-    setLogSuccessMessage(`[SYSTEM LOG]: ${simSteps} steps recorded. Hunter XP and Golden Mana harvested!`);
+    setLogSuccessMessage(`[SYSTEM LOG]: ${simSteps} steps recorded. Player XP and Golden Mana harvested!`);
     setTimeout(() => setLogSuccessMessage(''), 3500);
   };
 
@@ -72,7 +72,7 @@ export const HomeView = ({ setActiveTab }) => {
               </span>
               <span className="text-[11px] font-mono text-[#39ff14] flex items-center space-x-1">
                 <span className="w-1.5 h-1.5 bg-[#39ff14] rounded-full animate-ping"></span>
-                <span>HUNTER AWAKENED</span>
+                <span>PLAYER AWAKENED</span>
               </span>
             </div>
 
@@ -118,7 +118,7 @@ export const HomeView = ({ setActiveTab }) => {
               </div>
             </div>
 
-            {/* Vitals: Streak, Energy, Hunter Rank */}
+            {/* Vitals: Streak, Energy, Player Rank */}
             <div className="grid grid-cols-3 gap-2.5 mt-4">
               <div className="bg-[#170f03] border border-[#ffbe3b]/30 rounded-lg p-2 text-center">
                 <div className="flex items-center justify-center space-x-1 text-[#ff9900] text-xs font-mono">
@@ -256,7 +256,7 @@ export const HomeView = ({ setActiveTab }) => {
             </h3>
           </div>
           <span className="text-[10px] font-mono text-[#ffd700] uppercase">
-            PHYSICAL ENERGY → HUNTER XP
+            PHYSICAL ENERGY → PLAYER XP
           </span>
         </div>
 

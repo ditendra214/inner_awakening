@@ -27,7 +27,7 @@ export const ProfileView = ({ onOpenOnboarding }) => {
 
   const getBmiCategory = (val) => {
     if (val < 18.5) return { label: 'Underweight / Lean Matrix', color: 'text-blue-400' };
-    if (val < 24.9) return { label: 'Optimal Hunter Density', color: 'text-[#39ff14]' };
+    if (val < 24.9) return { label: 'Optimal Player Density', color: 'text-[#39ff14]' };
     if (val < 29.9) return { label: 'Elevated Mass Index', color: 'text-amber-400' };
     return { label: 'High Kinetic Load', color: 'text-rose-400' };
   };
@@ -51,7 +51,7 @@ export const ProfileView = ({ onOpenOnboarding }) => {
             </div>
           </div>
 
-          {/* Hunter Details matching uploaded photo */}
+          {/* Player Details matching uploaded photo */}
           <div className="flex-1 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start space-x-2">
               <span className="px-2.5 py-0.5 bg-[#2a1a05] border border-[#ffd700] text-[10px] font-mono text-[#ffd700] rounded uppercase font-bold">
@@ -95,7 +95,7 @@ export const ProfileView = ({ onOpenOnboarding }) => {
               : 'bg-[#140e04] text-amber-400/80 hover:text-white border border-[#ffbe3b]/30'
           }`}
         >
-          Hunter Attributes
+          Player Attributes
         </button>
 
         <button
@@ -127,7 +127,7 @@ export const ProfileView = ({ onOpenOnboarding }) => {
           <div className="flex items-center justify-between border-b border-[#ffbe3b]/30 pb-3">
             <div>
               <h3 className="font-cyber text-base font-bold text-white uppercase tracking-wider">
-                [ HUNTER ATTRIBUTES: BIO-GAME METRICS ]
+                [ PLAYER ATTRIBUTES: BIO-GAME METRICS ]
               </h3>
               <p className="text-xs text-amber-200/70">
                 Grows in real-time as you complete real-life physical activity and quests.

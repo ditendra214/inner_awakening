@@ -207,7 +207,7 @@ class SoundEngine {
       this.playSoloLevelingMessageTone();
 
       const now = this.ctx.currentTime + 0.1;
-      // Majestic ascending hunter harmonic arpeggio
+      // Majestic ascending player harmonic arpeggio
       const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98, 2093.00];
 
       notes.forEach((freq, i) => {
