@@ -1,5 +1,6 @@
-// 2050 Cybernetic Procedural Sound Engine using Web Audio API
-// High-performance, zero external assets, instant responsive sci-fi audio design
+// Solo Leveling System Audio Synthesizer using Web Audio API
+// Accurately reproduces the iconic crystalline ethereal "Ding!" System Message Tone
+// Zero external audio files, works instantly in any browser offline.
 
 class SoundEngine {
   constructor() {
@@ -8,7 +9,7 @@ class SoundEngine {
     this.ambientDrone = null;
     this.ambientGain = null;
     this.isDronePlaying = false;
-    this.volume = 0.7;
+    this.volume = 0.75;
   }
 
   initContext() {
@@ -39,7 +40,83 @@ class SoundEngine {
     }
   }
 
-  // Quick tactile cyber click for buttons
+  // 🔔 THE ICONIC SOLO LEVELING SYSTEM MESSAGE TONE ("Ding-g-g...")
+  // High-resonance ethereal crystal bell with shimmering overtone & dark mana sub undertone
+  playSoloLevelingMessageTone() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+
+      // 1. Crystal High Harmonic Sine (C7: ~2093Hz + slight detune for shimmering bell ring)
+      const primaryFreq = 2093; 
+      const overtoneFreq = 3136; // G7 harmonic
+      const highShimmerFreq = 4186; // C8 crystal sparkle
+
+      const bellFrequencies = [
+        { f: primaryFreq, gain: 0.35, decay: 1.8 },
+        { f: primaryFreq * 1.004, gain: 0.25, decay: 1.6 }, // detune shimmer
+        { f: overtoneFreq, gain: 0.2, decay: 1.2 },
+        { f: highShimmerFreq, gain: 0.12, decay: 0.8 },
+      ];
+
+      bellFrequencies.forEach(({ f, gain, decay }) => {
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now);
+
+        g.gain.setValueAtTime(gain * this.volume, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        osc.connect(g);
+        g.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + decay);
+      });
+
+      // 2. Metallic Impulse ping (triangle wave fast transient)
+      const attackOsc = this.ctx.createOscillator();
+      const attackGain = this.ctx.createGain();
+      attackOsc.type = 'triangle';
+      attackOsc.frequency.setValueAtTime(1046.5, now); // C6
+      attackOsc.frequency.exponentialRampToValueAtTime(523.25, now + 0.08);
+
+      attackGain.gain.setValueAtTime(0.3 * this.volume, now);
+      attackGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+      attackOsc.connect(attackGain);
+      attackGain.connect(this.ctx.destination);
+
+      attackOsc.start(now);
+      attackOsc.stop(now + 0.08);
+
+      // 3. Ominous Shadow Monarch Sub-bass undertone (~65Hz)
+      const subOsc = this.ctx.createOscillator();
+      const subGain = this.ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(65.4, now); // C2 low resonance
+      subOsc.frequency.exponentialRampToValueAtTime(45, now + 0.9);
+
+      subGain.gain.setValueAtTime(0.22 * this.volume, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+      subOsc.connect(subGain);
+      subGain.connect(this.ctx.destination);
+
+      subOsc.start(now);
+      subOsc.stop(now + 0.9);
+
+    } catch (e) {
+      console.warn("Audio context not ready yet", e);
+    }
+  }
+
+  // System Click / HUD Interaction
   playClick() {
     if (this.isMuted) return;
     this.initContext();
@@ -50,11 +127,11 @@ class SoundEngine {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1318.5, now); // E6
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.04);
 
-      gain.gain.setValueAtTime(0.15 * this.volume, now);
+      gain.gain.setValueAtTime(0.18 * this.volume, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
       osc.connect(gain);
@@ -62,12 +139,10 @@ class SoundEngine {
 
       osc.start(now);
       osc.stop(now + 0.04);
-    } catch (e) {
-      // Audio context might need user interaction first
-    }
+    } catch (e) {}
   }
 
-  // Futuristic high-tech chirp for HUD navigation
+  // System Chirp for Navigation
   playChirp() {
     if (this.isMuted) return;
     this.initContext();
@@ -76,33 +151,24 @@ class SoundEngine {
     try {
       const now = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
-      const osc2 = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc2.type = 'sine';
+      osc.frequency.setValueAtTime(1760, now); // A6
+      osc.frequency.exponentialRampToValueAtTime(2637, now + 0.07); // E7
 
-      osc.frequency.setValueAtTime(1400, now);
-      osc.frequency.exponentialRampToValueAtTime(2200, now + 0.08);
-
-      osc2.frequency.setValueAtTime(700, now);
-      osc2.frequency.exponentialRampToValueAtTime(1100, now + 0.08);
-
-      gain.gain.setValueAtTime(0.12 * this.volume, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      gain.gain.setValueAtTime(0.15 * this.volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
       osc.connect(gain);
-      osc2.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(now);
-      osc2.start(now);
-      osc.stop(now + 0.09);
-      osc2.stop(now + 0.09);
+      osc.stop(now + 0.08);
     } catch (e) {}
   }
 
-  // Crystal FitCoin collection ping
+  // FitCoins / Golden Mana Crystal Ping
   playCoin() {
     if (this.isMuted) return;
     this.initContext();
@@ -110,136 +176,71 @@ class SoundEngine {
 
     try {
       const now = this.ctx.currentTime;
-      const notes = [987.77, 1318.51]; // B5 -> E6
+      const notes = [1318.51, 1760.00, 2093.00]; // E6, A6, C7
       notes.forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        const start = now + idx * 0.06;
+        const start = now + idx * 0.05;
 
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, start);
 
         gain.gain.setValueAtTime(0.2 * this.volume, start);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
         osc.start(start);
-        osc.stop(start + 0.25);
+        osc.stop(start + 0.35);
       });
     } catch (e) {}
   }
 
-  // 2050 Cyber Level Up Fanfare
+  // Solo Leveling Ascension / Level Up Fanfare
   playLevelUp() {
     if (this.isMuted) return;
     this.initContext();
     if (!this.ctx) return;
 
     try {
-      const now = this.ctx.currentTime;
-      // Ascending major pentatonic cyber chord: C5, E5, G5, B5, C6
-      const arpeggio = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
+      this.playSoloLevelingMessageTone();
 
-      arpeggio.forEach((freq, i) => {
-        const startTime = now + i * 0.08;
+      const now = this.ctx.currentTime + 0.1;
+      // Majestic ascending hunter harmonic arpeggio
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98, 2093.00];
+
+      notes.forEach((freq, i) => {
+        const startTime = now + i * 0.09;
         const osc = this.ctx.createOscillator();
-        const subOsc = this.ctx.createOscillator();
-        const filter = this.ctx.createBiquadFilter();
         const gain = this.ctx.createGain();
 
-        osc.type = 'sawtooth';
-        subOsc.type = 'sine';
+        osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, startTime);
-        subOsc.frequency.setValueAtTime(freq / 2, startTime);
 
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(3000, startTime);
-        filter.frequency.exponentialRampToValueAtTime(800, startTime + 0.5);
-
-        gain.gain.setValueAtTime(0.22 * this.volume, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
-
-        osc.connect(filter);
-        subOsc.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
-
-        osc.start(startTime);
-        subOsc.start(startTime);
-        osc.stop(startTime + 0.6);
-        subOsc.stop(startTime + 0.6);
-      });
-    } catch (e) {}
-  }
-
-  // Quest Completed celebratory harmonic sweep
-  playQuestComplete() {
-    if (this.isMuted) return;
-    this.initContext();
-    if (!this.ctx) return;
-
-    try {
-      const now = this.ctx.currentTime;
-      const chords = [
-        [587.33, 739.99, 880.00], // D major
-        [783.99, 987.77, 1174.66]  // G major
-      ];
-
-      chords.forEach((chord, step) => {
-        const stepTime = now + step * 0.18;
-        chord.forEach((freq) => {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, stepTime);
-
-          gain.gain.setValueAtTime(0.18 * this.volume, stepTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, stepTime + 0.4);
-
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-
-          osc.start(stepTime);
-          osc.stop(stepTime + 0.4);
-        });
-      });
-    } catch (e) {}
-  }
-
-  // Holographic Notification warning/alert (matches wireframe modal alert)
-  playNotification() {
-    if (this.isMuted) return;
-    this.initContext();
-    if (!this.ctx) return;
-
-    try {
-      const now = this.ctx.currentTime;
-      // Dual high-tech alert pulse: 880Hz -> 1760Hz
-      const tones = [880, 1760, 880, 1760];
-      tones.forEach((tone, i) => {
-        const t = now + i * 0.09;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(tone, t);
-
-        gain.gain.setValueAtTime(0.16 * this.volume, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+        gain.gain.setValueAtTime(0.2 * this.volume, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
 
         osc.connect(gain);
         gain.connect(this.ctx.destination);
 
-        osc.start(t);
-        osc.stop(t + 0.08);
+        osc.start(startTime);
+        osc.stop(startTime + 0.5);
       });
     } catch (e) {}
   }
 
-  // Ambient 2050 Cyber Pulse / Reactor Drone
+  // Quest Completed Chime
+  playQuestComplete() {
+    this.playSoloLevelingMessageTone();
+  }
+
+  // Default notification uses the Solo Leveling tone
+  playNotification() {
+    this.playSoloLevelingMessageTone();
+  }
+
+  // Shadow Monarch Atmosphere (Low Binaural Mist Drone)
   toggleAmbientDrone() {
     this.initContext();
     if (!this.ctx) return false;
@@ -267,28 +268,17 @@ class SoundEngine {
         now + 1.5
       );
 
-      // Low sub bass + binaural detune
       const osc1 = this.ctx.createOscillator();
       const osc2 = this.ctx.createOscillator();
-      const lfo = this.ctx.createOscillator();
-      const lfoGain = this.ctx.createGain();
-
       osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(55, now); // A1 sub
+      osc1.frequency.setValueAtTime(55, now); // low A
 
       osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(55.6, now); // slight detune for space beat
-
-      lfo.type = 'sine';
-      lfo.frequency.setValueAtTime(0.2, now); // 0.2Hz breathing pulse
-      lfoGain.gain.setValueAtTime(15, now);
-
-      lfo.connect(lfoGain);
-      lfoGain.connect(osc1.frequency);
+      osc2.frequency.setValueAtTime(55.4, now);
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(140, now);
+      filter.frequency.setValueAtTime(120, now);
 
       osc1.connect(filter);
       osc2.connect(filter);
@@ -297,9 +287,8 @@ class SoundEngine {
 
       osc1.start(now);
       osc2.start(now);
-      lfo.start(now);
 
-      this.ambientDrone = [osc1, osc2, lfo];
+      this.ambientDrone = [osc1, osc2];
       this.isDronePlaying = true;
       return true;
     }

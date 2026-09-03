@@ -8,17 +8,20 @@ export default {
     extend: {
       colors: {
         cyber: {
-          dark: '#060810',
-          card: 'rgba(13, 19, 38, 0.85)',
-          panel: 'rgba(18, 27, 54, 0.75)',
-          border: 'rgba(0, 240, 255, 0.25)',
-          cyan: '#00f0ff',
-          pink: '#ff007f',
-          green: '#39ff14',
-          yellow: '#ffe600',
-          amber: '#ff9900',
-          blue: '#1e51ff',
-          purple: '#9d00ff'
+          dark: '#05070e',
+          card: 'rgba(18, 14, 6, 0.85)',
+          panel: 'rgba(25, 19, 8, 0.75)',
+          border: 'rgba(255, 191, 0, 0.35)',
+          cyan: '#ffbe3b', // solo leveling gold
+          pink: '#f59e0b',
+          green: '#ffd700',
+          yellow: '#fff275',
+          amber: '#e69500',
+          blue: '#1e3a8a',
+          purple: '#d97706',
+          gold: '#ffd700',
+          systemGold: '#ffbe3b',
+          shadowNavy: '#070b16'
         }
       },
       fontFamily: {
@@ -27,24 +30,25 @@ export default {
         sans: ['Rajdhani', 'sans-serif']
       },
       boxShadow: {
-        'neon-cyan': '0 0 15px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2)',
-        'neon-pink': '0 0 15px rgba(255, 0, 127, 0.5), 0 0 30px rgba(255, 0, 127, 0.2)',
-        'neon-green': '0 0 15px rgba(57, 255, 20, 0.5), 0 0 30px rgba(57, 255, 20, 0.2)',
-        'hud-box': 'inset 0 0 15px rgba(0, 240, 255, 0.15), 0 0 20px rgba(0, 0, 0, 0.8)'
+        'neon-gold': '0 0 15px rgba(255, 191, 0, 0.45), 0 0 35px rgba(255, 191, 0, 0.15)',
+        'neon-cyan': '0 0 15px rgba(255, 191, 0, 0.45), 0 0 35px rgba(255, 191, 0, 0.15)',
+        'neon-pink': '0 0 15px rgba(245, 158, 11, 0.45), 0 0 35px rgba(245, 158, 11, 0.15)',
+        'neon-green': '0 0 15px rgba(255, 215, 0, 0.45), 0 0 35px rgba(255, 215, 0, 0.15)',
+        'system-window': '0 0 25px rgba(255, 191, 0, 0.25), inset 0 0 15px rgba(255, 191, 0, 0.08)'
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'glow-cyan': 'glowCyan 2s ease-in-out infinite alternate',
-        'scanline': 'scanline 8s linear infinite'
+        'glow-gold': 'glowGold 2s ease-in-out infinite alternate',
+        'system-flicker': 'systemFlicker 4s infinite'
       },
       keyframes: {
-        glowCyan: {
-          '0%': { boxShadow: '0 0 5px rgba(0, 240, 255, 0.3)' },
-          '100%': { boxShadow: '0 0 20px rgba(0, 240, 255, 0.7)' }
+        glowGold: {
+          '0%': { boxShadow: '0 0 8px rgba(255, 191, 0, 0.3)' },
+          '100%': { boxShadow: '0 0 25px rgba(255, 191, 0, 0.7)' }
         },
-        scanline: {
-          '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(1000%)' }
+        systemFlicker: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.92 }
         }
       }
     },

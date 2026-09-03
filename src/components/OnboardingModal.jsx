@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Activity, ShieldAlert, Sparkles, User, Heart, Compass, 
-  Dumbbell, Target, CheckCircle2, ChevronRight, Lock
+  Dumbbell, Target, CheckCircle2, ChevronRight, Crown
 } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { sound } from '../services/soundEngine';
@@ -11,12 +11,12 @@ export const OnboardingModal = () => {
   const [step, setStep] = useState(profile.completedOnboarding ? 'done' : 'landing');
 
   // Form states
-  const [name, setName] = useState(profile.name || 'Neo_Vanguard');
+  const [name, setName] = useState(profile.name || 'Sung_Jin_Woo');
   const [gender, setGender] = useState(profile.gender || 'Cyber Synth');
   const [goal, setGoal] = useState(profile.goal || 'Titan Strength');
-  const [age, setAge] = useState(profile.age || 21);
-  const [height, setHeight] = useState(profile.height || 175);
-  const [weight, setWeight] = useState(profile.weight || 70);
+  const [age, setAge] = useState(profile.age || 22);
+  const [height, setHeight] = useState(profile.height || 178);
+  const [weight, setWeight] = useState(profile.weight || 72);
   const [selectedIssues, setSelectedIssues] = useState(profile.healthIssues || ['None / Iron Core']);
   const [customHealthNote, setCustomHealthNote] = useState(profile.healthNotes || '');
   const [department, setDepartment] = useState(profile.department || 'CSE-A');
@@ -33,10 +33,10 @@ export const OnboardingModal = () => {
   ];
 
   const GOAL_OPTIONS = [
-    { id: 'Titan Strength', title: 'Titan Strength', desc: 'Hyper-density muscle synthesis & power output' },
-    { id: 'Nano Agility', title: 'Nano Agility', desc: 'Accelerated fat oxidation & reflex speed' },
-    { id: 'Neon Endurance', title: 'Neon Endurance', desc: 'High-mileage VO2 cardio conditioning' },
-    { id: 'Zen Flow', title: 'Zen Flow', desc: 'Mobility, joint restoration & neural calmness' }
+    { id: 'Titan Strength', title: 'Shadow Monarch (Strength)', desc: 'Maximal muscle power output & hyper-density' },
+    { id: 'Nano Agility', title: 'Wind Runner (Agility)', desc: 'Speed acceleration, high-reflex & rapid fat burn' },
+    { id: 'Neon Endurance', title: 'Endless Stamina (Cardio)', desc: 'High-VO2 respiratory endurance & stamina pool' },
+    { id: 'Zen Flow', title: 'Mana Regeneration (Mobility)', desc: 'Full-body flexibility, joint healing & calmness' }
   ];
 
   const handleToggleIssue = (label) => {
@@ -57,13 +57,12 @@ export const OnboardingModal = () => {
   };
 
   const handleStartNow = () => {
-    sound.playChirp();
+    sound.playSoloLevelingMessageTone();
     setStep('form');
   };
 
   const handleSignIn = () => {
-    sound.playClick();
-    // Pre-fill and proceed
+    sound.playSoloLevelingMessageTone();
     setStep('form');
   };
 
@@ -89,31 +88,27 @@ export const OnboardingModal = () => {
     setStep('done');
   };
 
-  // Calculate BMI preview
-  const heightMeters = height / 100;
-  const bmi = (weight / (heightMeters * heightMeters)).toFixed(1);
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/90 backdrop-blur-xl overflow-y-auto">
-      {/* 1. Landing View matching user wireframe sketch (Mobile frame with INNER AWAKENING, start now, sign in) */}
+      {/* 1. Landing View matching user wireframe sketch with Solo Leveling Gold styling */}
       {step === 'landing' && (
-        <div className="relative w-full max-w-sm border-4 border-cyan-400 rounded-3xl p-8 bg-[#0a0f1d] shadow-neon-cyan flex flex-col items-center justify-between min-h-[580px] my-auto">
-          {/* Top Speaker Slot simulation */}
-          <div className="w-20 h-1.5 bg-cyan-900 rounded-full mb-6"></div>
+        <div className="relative w-full max-w-sm border-4 border-[#ffbe3b] rounded-3xl p-8 bg-[#090602] shadow-neon-gold flex flex-col items-center justify-between min-h-[580px] my-auto">
+          {/* Top Speaker Slot */}
+          <div className="w-20 h-1.5 bg-[#2c1d04] rounded-full mb-6"></div>
 
           {/* Title Header */}
           <div className="text-center my-auto flex flex-col items-center">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-400 flex items-center justify-center mb-6 shadow-neon-cyan">
-              <Sparkles className="text-cyan-400 w-8 h-8 animate-pulse" />
+            <div className="w-16 h-16 rounded-2xl bg-[#ffbe3b]/10 border border-[#ffd700] flex items-center justify-center mb-6 shadow-neon-gold">
+              <Crown className="text-[#ffd700] w-9 h-9 animate-pulse" />
             </div>
-            <h1 className="font-cyber text-3xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500 uppercase leading-tight drop-shadow-[0_0_15px_rgba(0,240,255,0.6)]">
+            <h1 className="font-cyber text-3xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-[#ffd700] via-white to-[#ffbe3b] uppercase leading-tight gold-glow-text">
               INNER<br />AWAKENING
             </h1>
-            <p className="font-mono text-xs tracking-widest text-cyan-300/70 mt-3 uppercase">
-              2050 Real-Life Fitness RPG
+            <p className="font-mono text-xs tracking-widest text-[#ffd700]/80 mt-3 uppercase">
+              [ SYSTEM: SHADOW HUNTER PROTOCOL ]
             </p>
-            <div className="mt-4 px-3 py-1 bg-cyan-950/60 border border-cyan-500/40 rounded text-[11px] font-mono text-cyan-300">
-              REAL WORLD → GAME → GROWTH
+            <div className="mt-4 px-3 py-1 bg-[#221603] border border-[#ffbe3b]/50 rounded text-[11px] font-mono text-[#ffd700]">
+              REAL WORLD → SYSTEM → LEVEL UP
             </div>
           </div>
 
@@ -121,7 +116,7 @@ export const OnboardingModal = () => {
           <div className="w-full space-y-4 mt-8">
             <button
               onClick={handleStartNow}
-              className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-cyber font-black tracking-widest text-base uppercase rounded-xl shadow-neon-cyan transition-transform transform active:scale-95 flex items-center justify-center space-x-2"
+              className="w-full py-3.5 bg-gradient-to-r from-[#e69500] to-[#ffd700] hover:from-[#ffd700] hover:to-[#ffea75] text-black font-cyber font-black tracking-widest text-base uppercase rounded-xl shadow-neon-gold transition-transform transform active:scale-95 flex items-center justify-center space-x-2"
             >
               <span>START NOW</span>
               <ChevronRight size={20} />
@@ -129,35 +124,32 @@ export const OnboardingModal = () => {
 
             <button
               onClick={handleSignIn}
-              className="w-full py-2.5 bg-transparent hover:bg-slate-800/40 text-slate-300 hover:text-white font-mono text-sm tracking-wider uppercase underline decoration-cyan-400 transition-colors"
+              className="w-full py-2.5 bg-transparent hover:bg-amber-950/40 text-amber-300 font-mono text-sm tracking-wider uppercase underline decoration-[#ffd700] transition-colors"
             >
               SIGN IN
             </button>
           </div>
 
-          {/* Bottom Home Indicator */}
-          <div className="w-28 h-1 bg-slate-700 rounded-full mt-6"></div>
+          {/* Bottom Home Bar */}
+          <div className="w-28 h-1 bg-amber-900/60 rounded-full mt-6"></div>
         </div>
       )}
 
-      {/* 2. Health Care & User Intake Form */}
+      {/* 2. Health Care & User Intake Form with Solo Leveling Golden HUD */}
       {step === 'form' && (
-        <div className="relative w-full max-w-2xl bg-[#0b1122] border-2 border-cyan-400/60 rounded-2xl p-6 md:p-8 shadow-neon-cyan my-auto max-h-[90vh] overflow-y-auto">
-          {/* Scanline effect */}
-          <div className="absolute inset-0 scanline-overlay pointer-events-none opacity-20"></div>
-
+        <div className="relative w-full max-w-2xl bg-[#0a0702] border-2 border-[#ffbe3b] rounded-2xl p-6 md:p-8 shadow-neon-gold my-auto max-h-[90vh] overflow-y-auto system-window">
           {/* Top Banner */}
-          <div className="flex items-center justify-between border-b border-cyan-500/30 pb-4 mb-6">
+          <div className="flex items-center justify-between border-b border-[#ffbe3b]/40 pb-4 mb-6">
             <div>
-              <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">
-                [ PROTOCOL 2050: HEALTH & BIO-TELEMETRY ]
+              <span className="text-[10px] font-mono text-[#ffd700] uppercase tracking-widest">
+                [ SYSTEM: HUNTER REGISTRATION & HEALTH TELEMETRY ]
               </span>
-              <h2 className="font-cyber text-2xl font-black tracking-wide text-white uppercase mt-1">
-                AWAKEN YOUR PROFILE
+              <h2 className="font-cyber text-2xl font-black tracking-wide text-white uppercase mt-1 gold-glow-text">
+                AWAKEN YOUR STATUS WINDOW
               </h2>
             </div>
-            <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-400/40 flex items-center justify-center">
-              <Activity className="text-cyan-400" size={22} />
+            <div className="w-10 h-10 rounded-lg bg-[#ffbe3b]/10 border border-[#ffd700] flex items-center justify-center">
+              <Activity className="text-[#ffd700]" size={22} />
             </div>
           </div>
 
@@ -165,27 +157,27 @@ export const OnboardingModal = () => {
             {/* Alias & Gender */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
-                  Character Call-Sign (Alias)
+                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
+                  Hunter Call-Sign (Alias)
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
-                  placeholder="e.g. CyberRunner_99"
+                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
+                  placeholder="e.g. Sung_Jin_Woo"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
-                  Biological / Synth Gender
+                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
+                  Hunter Classification / Gender
                 </label>
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
                 >
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -197,8 +189,8 @@ export const OnboardingModal = () => {
 
             {/* Choose Your Goal */}
             <div>
-              <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-2">
-                Choose Your Primary Evolution Goal
+              <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-2">
+                Choose Your Hunter Path (Evolution Goal)
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {GOAL_OPTIONS.map((g) => (
@@ -207,15 +199,15 @@ export const OnboardingModal = () => {
                     onClick={() => { sound.playClick(); setGoal(g.id); }}
                     className={`cursor-pointer p-3 rounded-lg border transition-all ${
                       goal === g.id
-                        ? 'border-cyan-400 bg-cyan-950/50 shadow-neon-cyan'
-                        : 'border-slate-800 bg-[#0d1428] hover:border-slate-600'
+                        ? 'border-[#ffd700] bg-[#271b05] shadow-neon-gold'
+                        : 'border-amber-950/60 bg-[#120c03] hover:border-amber-800'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <h4 className="font-cyber text-sm font-bold text-white">{g.title}</h4>
-                      {goal === g.id && <CheckCircle2 size={16} className="text-cyan-400" />}
+                      {goal === g.id && <CheckCircle2 size={16} className="text-[#ffd700]" />}
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{g.desc}</p>
+                    <p className="text-xs text-amber-200/70 mt-1">{g.desc}</p>
                   </div>
                 ))}
               </div>
@@ -224,7 +216,7 @@ export const OnboardingModal = () => {
             {/* Biometrics: Age, Height, Weight */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
                   Age (Years)
                 </label>
                 <input
@@ -234,12 +226,12 @@ export const OnboardingModal = () => {
                   required
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
                   Height (cm)
                 </label>
                 <input
@@ -249,12 +241,12 @@ export const OnboardingModal = () => {
                   required
                   value={height}
                   onChange={(e) => setHeight(e.target.value)}
-                  className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1">
                   Weight (kg)
                 </label>
                 <input
@@ -264,21 +256,21 @@ export const OnboardingModal = () => {
                   required
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
                 />
               </div>
             </div>
 
-            {/* Health issues for user health care (CRUCIAL REQUIREMENT) */}
-            <div className="border border-pink-500/40 bg-pink-950/20 p-4 rounded-xl">
-              <div className="flex items-center space-x-2 text-pink-400 mb-2">
+            {/* Health issues for user health care */}
+            <div className="border border-amber-500/50 bg-[#1c1203] p-4 rounded-xl">
+              <div className="flex items-center space-x-2 text-[#ffd700] mb-2">
                 <ShieldAlert size={18} />
                 <h3 className="font-cyber text-sm font-bold uppercase tracking-wider">
                   Health Care & Safe Conditioning Matrix
                 </h3>
               </div>
-              <p className="text-xs text-slate-300 mb-3">
-                Inner Awakening prioritizes your long-term health. Mark any conditions so our AI Game Master adapts mission intensity to safeguard your well-being.
+              <p className="text-xs text-amber-200/80 mb-3">
+                Inner Awakening safeguards your physical body. The System calibrates daily quests to prevent joint strain or cardiovascular damage.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
@@ -290,11 +282,11 @@ export const OnboardingModal = () => {
                       onClick={() => handleToggleIssue(opt.label)}
                       className={`cursor-pointer px-3 py-2 rounded text-xs border flex items-center space-x-2 transition-colors ${
                         active
-                          ? 'border-pink-500 bg-pink-900/40 text-white font-semibold'
-                          : 'border-slate-800 bg-[#0d1428] text-slate-400 hover:border-slate-700'
+                          ? 'border-[#ffd700] bg-[#342408] text-white font-semibold shadow-[0_0_8px_rgba(255,215,0,0.3)]'
+                          : 'border-amber-950 bg-[#100b02] text-amber-300/60 hover:border-amber-800'
                       }`}
                     >
-                      <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center ${active ? 'border-pink-400 bg-pink-500' : 'border-slate-600'}`}>
+                      <div className={`w-3.5 h-3.5 rounded-sm border flex items-center justify-center ${active ? 'border-[#ffd700] bg-[#ffd700]' : 'border-amber-700'}`}>
                         {active && <div className="w-1.5 h-1.5 bg-black rounded-sm"></div>}
                       </div>
                       <span className="truncate">{opt.label}</span>
@@ -304,7 +296,7 @@ export const OnboardingModal = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1">
+                <label className="block text-[11px] font-mono text-amber-300/70 uppercase tracking-wider mb-1">
                   Additional Medical / Health Care Notes (Optional)
                 </label>
                 <input
@@ -312,25 +304,25 @@ export const OnboardingModal = () => {
                   value={customHealthNote}
                   onChange={(e) => setCustomHealthNote(e.target.value)}
                   placeholder="e.g., healing from sprained ankle, low sodium requirement, etc."
-                  className="w-full bg-[#121a33] border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-pink-400"
+                  className="w-full bg-[#140e04] border border-amber-900 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#ffd700]"
                 />
               </div>
             </div>
 
             {/* Department / College Team Selection */}
             <div>
-              <label className="block text-xs font-mono text-cyan-300 uppercase tracking-wider mb-1.5">
-                Affiliated Campus / College Guild
+              <label className="block text-xs font-mono text-[#ffd700] uppercase tracking-wider mb-1.5">
+                Affiliated Hunter Guild (Campus Squad)
               </label>
               <select
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                className="w-full bg-[#121a33] border border-cyan-500/40 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-cyan-400"
+                className="w-full bg-[#181003] border border-[#ffbe3b]/50 rounded px-3 py-2 text-white font-sans focus:outline-none focus:border-[#ffd700]"
               >
-                <option value="CSE-A">CSE-A (Cyber Synergists)</option>
-                <option value="CSE-B">CSE-B (Quantum Dynamos)</option>
-                <option value="IT-A">IT-A (Neural Phantoms)</option>
-                <option value="MECH-1">MECH Titan Force</option>
+                <option value="CSE-A">CSE-A (Shadow Legion Guild)</option>
+                <option value="CSE-B">CSE-B (White Tiger Guild)</option>
+                <option value="IT-A">IT-A (Fiend Guild)</option>
+                <option value="MECH-1">MECH Titan Guild</option>
               </select>
             </div>
 
@@ -338,10 +330,10 @@ export const OnboardingModal = () => {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-cyan-500 to-fuchsia-600 hover:from-cyan-400 hover:to-fuchsia-500 text-black font-cyber font-black tracking-widest text-base uppercase rounded-xl shadow-neon-cyan transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2"
+                className="w-full py-4 bg-gradient-to-r from-[#e69500] via-[#ffd700] to-[#fff1a8] hover:from-[#ffd700] hover:to-[#fff9cc] text-black font-cyber font-black tracking-widest text-base uppercase rounded-xl shadow-neon-gold transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2"
               >
                 <Sparkles size={20} className="fill-black" />
-                <span>INITIATE INNER AWAKENING</span>
+                <span>ACCEPT AWAKENING & ENTER SYSTEM</span>
               </button>
             </div>
           </form>
