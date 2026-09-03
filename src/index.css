@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background-color: #060810;
+  background-image: 
+    radial-gradient(circle at 50% 10%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255, 0, 127, 0.05) 0%, transparent 40%),
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+  min-height: 100vh;
+}
+
+/* Custom Cyber Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060810;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.6);
+}
+
+/* Cyber Glow Utilities */
+.neon-border-cyan {
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.neon-border-pink {
+  border: 1px solid rgba(255, 0, 127, 0.4);
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.2), inset 0 0 10px rgba(255, 0, 127, 0.1);
+}
+
+.neon-border-green {
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2), inset 0 0 10px rgba(57, 255, 20, 0.1);
+}
+
+.cyber-card {
+  background: rgba(12, 18, 36, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+}
+
+.cyber-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #00f0ff;
+  border-right: 2px solid #00f0ff;
+}
+
+.cyber-cut {
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.cyber-cut-reverse {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.scanline-overlay {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
