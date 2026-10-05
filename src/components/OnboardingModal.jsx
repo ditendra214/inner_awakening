@@ -112,7 +112,7 @@ export const OnboardingModal = () => {
       weight: Number(weight),
       healthIssues: selectedIssues,
       healthNotes: customHealthNote,
-      department: 'CSE-A' // default guild in background
+      department: 'Shadow Legion'
     });
     setCurrentStep('done');
   };

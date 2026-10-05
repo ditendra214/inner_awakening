@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # 1. FastAPI Backend Server
+  # ============================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inner_awakening_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=True
+      - POSTGRES_SERVER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_DB=inner_awakening
+      - USE_SQLITE=False
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SECRET_KEY=inner-awakening-super-secret-production-grade-jwt-key-change-me
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - inner_awakening_net
+
+  # ============================================================================
+  # 2. PostgreSQL Database
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: inner_awakening_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: inner_awakening
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d inner_awakening"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inner_awakening_net
+
+  # ============================================================================
+  # 3. Redis Cache & Realtime PubSub
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: inner_awakening_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inner_awakening_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  inner_awakening_net:
+    driver: bridge

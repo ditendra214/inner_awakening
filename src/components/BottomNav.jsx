@@ -1,10 +1,11 @@
 import React from 'react';
-import { Home, Gamepad2, Globe, Users, User } from 'lucide-react';
+import { Home, Crown, Gamepad2, Globe, Users, User } from 'lucide-react';
 import { sound } from '../services/soundEngine';
 
 export const BottomNav = ({ activeTab, setActiveTab }) => {
   const tabs = [
-    { id: 'home', label: 'Status', icon: Home, highlight: 'text-[#ffd700]', border: 'border-[#ffd700]' },
+    { id: 'home', label: 'Home', icon: Home, highlight: 'text-[#ffd700]', border: 'border-[#ffd700]' },
+    { id: 'rank', label: 'Rank', icon: Crown, highlight: 'text-[#ffd700]', border: 'border-[#ffd700]' },
     { id: 'play', label: 'Quests', icon: Gamepad2, highlight: 'text-[#ffbe3b]', border: 'border-[#ffbe3b]' },
     { id: 'world', label: 'Gates', icon: Globe, highlight: 'text-[#f59e0b]', border: 'border-[#f59e0b]' },
     { id: 'community', label: 'Guilds', icon: Users, highlight: 'text-[#ffd700]', border: 'border-[#ffd700]' },

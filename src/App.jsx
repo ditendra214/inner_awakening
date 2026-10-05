@@ -1,57 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameProvider, useGame } from './context/GameContext';
-import { Navbar } from './components/Navbar';
-import { BottomNav } from './components/BottomNav';
+import { navigationManager } from './services/navigationManager';
+
+import { RankView } from './views/RankView';
+import { InventoryPage } from './views/InventoryPage';
+import { ArtifactGearPage } from './views/ArtifactGearPage';
+import { UpgradeArtifactPage } from './views/UpgradeArtifactPage';
+import { RankArenaPage } from './views/RankArenaPage';
+import { ProfileView } from './views/ProfileView';
 import { NotificationModal } from './components/NotificationModal';
 import { OnboardingModal } from './components/OnboardingModal';
 
-import { HomeView } from './views/HomeView';
-import { PlayView } from './views/PlayView';
-import { WorldView } from './views/WorldView';
-import { CommunityView } from './views/CommunityView';
-import { ProfileView } from './views/ProfileView';
-
-const MainAppContent = () => {
-  const [activeTab, setActiveTab] = useState('home');
-  const [forceShowOnboarding, setForceShowOnboarding] = useState(false);
+const GameClientViewport = () => {
+  const [currentPage, setCurrentPage] = useState(navigationManager.getCurrentPage() || 'rank');
+  const [canGoBack, setCanGoBack] = useState(navigationManager.canGoBack());
   const { profile, setProfile } = useGame();
+  const [forceShowOnboarding, setForceShowOnboarding] = useState(false);
+
+  // Subscribe to NavigationManager changes
+  useEffect(() => {
+    const unsubscribe = navigationManager.subscribe(({ page, canBack }) => {
+      setCurrentPage(page);
+      setCanGoBack(canBack);
+    });
+    return unsubscribe;
+  }, []);
 
   const handleOpenOnboarding = () => {
     setProfile(prev => ({ ...prev, completedOnboarding: false }));
     setForceShowOnboarding(true);
   };
 
-  const handleNavigateToProfile = () => {
-    setActiveTab('me');
-  };
-
   return (
-    <div className="min-h-screen bg-[#05070e] text-slate-100 flex flex-col font-sans selection:bg-[#ffd700] selection:text-black">
-      {/* Top Solo Leveling System Navigation Bar with User Profile & Log Out */}
-      <Navbar 
-        onOpenHealthModal={handleOpenOnboarding} 
-        onNavigateToProfile={handleNavigateToProfile}
-      />
+    <div className="w-screen h-screen overflow-hidden bg-[#03060f] text-slate-100 flex flex-col font-sans select-none relative">
+      
+      {/* Active Screen Router */}
+      <main className="w-full h-full flex-1 relative overflow-hidden">
+        {(currentPage === 'rank' || currentPage === 'lobby') && (
+          <RankView />
+        )}
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-5 md:py-8">
-        {activeTab === 'home' && <HomeView setActiveTab={setActiveTab} />}
-        {activeTab === 'play' && <PlayView />}
-        {activeTab === 'world' && <WorldView />}
-        {activeTab === 'community' && <CommunityView />}
-        {activeTab === 'me' && <ProfileView onOpenOnboarding={handleOpenOnboarding} />}
+        {currentPage === 'inventory' && (
+          <InventoryPage />
+        )}
+
+        {currentPage === 'artifacts' && (
+          <ArtifactGearPage />
+        )}
+
+        {currentPage === 'upgrade' && (
+          <UpgradeArtifactPage />
+        )}
+
+        {currentPage === 'arena' && (
+          <RankArenaPage />
+        )}
+
+        {currentPage === 'profile' && (
+          <div className="w-full h-full overflow-y-auto bg-[#05070e] p-4">
+            <div className="max-w-5xl mx-auto">
+              <button
+                onClick={() => navigationManager.goBack()}
+                className="mb-4 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 font-cyber text-xs font-bold uppercase"
+              >
+                ← BACK TO LOBBY
+              </button>
+              <ProfileView onOpenOnboarding={handleOpenOnboarding} initialSubTab="stats" />
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Wireframe-accurate Solo Leveling Notification Modal */}
+      {/* Global Level-Up Notification Alert */}
       <NotificationModal />
 
-      {/* Health Care & Step-by-Step Onboarding Questionnaire Modal */}
+      {/* Onboarding Health Assessment Modal if first time */}
       {(!profile.completedOnboarding || forceShowOnboarding) && (
         <OnboardingModal />
       )}
-
-      {/* Bottom 5-Tab Navigation */}
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 };
@@ -59,7 +85,7 @@ const MainAppContent = () => {
 export default function App() {
   return (
     <GameProvider>
-      <MainAppContent />
+      <GameClientViewport />
     </GameProvider>
   );
 }
